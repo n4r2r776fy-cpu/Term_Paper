@@ -1,0 +1,201 @@
+@page "/appointments"
+@using Domain_Entities
+@using Services
+@using Repositories
+
+@inject AppointmentService AppService
+@inject IRepository<Appointment> AppRepo
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary"><i class="bi bi-calendar-check"></i> Панель керування записами</h2>
+        <div class="badge bg-info text-dark p-2">Всього записів: @appointments.Count()</div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 col-md-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-person-plus"></i> Новий клієнт</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ім'я клієнта</label>
+                        <input type="text" class="form-control form-control-lg" @bind="clientName" placeholder="Введіть ПІБ..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Телефон</label>
+                        <input type="tel" class="form-control" @bind="clientPhone" placeholder="+380..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Майстер</label>
+                        <select class="form-select" @bind="selectedSpecialistId">
+                            @foreach (var spec in availableSpecialists)
+                            {
+                                <option value="@spec.Id">@spec.Name — @spec.Specialization</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label fw-bold">Дата</label>
+                            <input type="date" class="form-control" @bind="appointmentDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-bold">Час</label>
+                            <input type="time" class="form-control" @bind="appointmentTime" />
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger p-2 small">@errorMessage</div>
+                    }
+
+                    <button class="btn btn-success btn-lg w-100 shadow-sm" @onclick="CreateRealAppointment">
+                        <i class="bi bi-check-circle"></i> Забронювати місце
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-light border-0" 
+                               placeholder="Пошук клієнта за іменем..." 
+                               @bind="searchTerm" @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Клієнт</th>
+                                    <th>Контакти</th>
+                                    <th>Майстер</th>
+                                    <th>Дата та час</th>
+                                    <th>Статус</th>
+                                    <th class="text-end pe-4">Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in FilteredAppointments)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-bold">@app.Client?.Name</div>
+                                            <small class="text-muted">ID: #@app.AppointmentId</small>
+                                        </td>
+                                        <td>@app.Client?.Phone</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-light text-dark border">
+                                                @app.Specialist?.Name
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>@app.Date.ToShortDateString()</div>
+                                            <div class="small text-primary fw-bold">@app.Time.ToString(@"hh\:mm")</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success-subtle text-success">Активний</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-outline-danger btn-sm border-0" @onclick="() => Cancel(app.AppointmentId)">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (!FilteredAppointments.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-emoji-frown display-4 text-muted"></i>
+                            <p class="mt-2 text-muted">Нікого не знайдено</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string clientName = "";
+    private string clientPhone = "";
+    private string searchTerm = "";
+    private string errorMessage = "";
+    
+    private DateTime appointmentDate = DateTime.Today.AddDays(1);
+    private TimeOnly appointmentTime = new TimeOnly(10, 0); 
+    private int selectedSpecialistId = 1;
+
+    private IEnumerable<Appointment> appointments = new List<Appointment>();
+    private int nextId = 1;
+
+    private List<Specialist> availableSpecialists = new List<Specialist>
+    {
+        new Specialist { Id = 1, Name = "Олена", Specialization = "Перукар" },
+        new Specialist { Id = 2, Name = "Іван", Specialization = "Барбер" },
+        new Specialist { Id = 3, Name = "Марія", Specialization = "Манікюр" },
+        new Specialist { Id = 4, Name = "Дмитро", Specialization = "Масаж" }
+    };
+
+    // Логіка фільтрації
+    private IEnumerable<Appointment> FilteredAppointments => 
+        string.IsNullOrWhiteSpace(searchTerm) 
+        ? appointments 
+        : appointments.Where(a => a.Client.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    protected override void OnInitialized() => RefreshList();
+
+    private void CreateRealAppointment()
+    {
+        if (string.IsNullOrWhiteSpace(clientName))
+        {
+            errorMessage = "Будь ласка, введіть ім'я!";
+            return;
+        }
+        
+        errorMessage = "";
+        var selectedSpec = availableSpecialists.First(s => s.Id == selectedSpecialistId);
+        
+        var newAppointment = new Appointment
+        {
+            AppointmentId = nextId++,
+            Client = new Client { Name = clientName, Phone = clientPhone },
+            Specialist = selectedSpec,
+            Date = appointmentDate,
+            Time = appointmentTime.ToTimeSpan(),
+            Status = "Підтверджено"
+        };
+
+        AppService.CreateAppointment(newAppointment);
+        ResetForm();
+        RefreshList();
+    }
+
+    private void ResetForm()
+    {
+        clientName = "";
+        clientPhone = "";
+        appointmentDate = DateTime.Today.AddDays(1);
+    }
+
+    private void Cancel(int id)
+    {
+        AppService.CancelAppointment(id);
+        RefreshList();
+    }
+
+    private void RefreshList() => appointments = AppRepo.GetAll();
+}

@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     namespace Domain_Entities {
         class Person {
@@ -100,3 +101,4 @@ classDiagram
     AuthService --> Person : authenticates
     Subject --> Observer
     Observer --> Notification : uses polymorphic send()
+```

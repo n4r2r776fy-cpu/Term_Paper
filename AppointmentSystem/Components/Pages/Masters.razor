@@ -1,0 +1,91 @@
+@page "/masters"
+@using AppointmentSystem.Data
+@inject ApplicationDbContext Db
+@rendermode InteractiveServer
+
+<div class="container py-5">
+    <h2 class="text-center gold-text mb-5 shadow-text">НАША КОМАНДА</h2>
+    
+    <div class="row">
+        @if (Db.Doctors != null && Db.Doctors.Any())
+        {
+            @foreach (var doctor in Db.Doctors.ToList())
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="master-card shadow border-gold bg-dark p-4 text-center">
+                        <div class="avatar-circle">
+                            <i class="bi bi-person-fill gold-text" style="font-size: 3.5rem;"></i>
+                        </div>
+                        <h4 class="mt-4 gold-text fw-bold">@doctor.Name</h4>
+                        <p class="text-secondary italic">@doctor.Specialization</p>
+                        <div class="gold-divider"></div>
+                        <p class="small text-light">Експерт з багаторічним досвідом у сфері преміум-сервісу.</p>
+                        <a href="booking" class="btn btn-outline-gold mt-3">ЗАПИСАТИСЯ</a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center text-secondary">
+                <p>Майстрів поки не додано до бази даних...</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .gold-text { color: #d4af37 !important; }
+    .border-gold { border: 1px solid #d4af37 !important; }
+    .bg-dark { background-color: rgba(20, 20, 20, 0.9) !important; }
+    
+    .master-card {
+        transition: all 0.4s ease;
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .master-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 15px 30px rgba(212, 175, 55, 0.15) !important;
+        background-color: #1a1a1a !important;
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, #2c2c2c 0%, #000000 100%);
+        border: 2px solid #d4af37;
+        border-radius: 50%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .gold-divider {
+        height: 1px;
+        width: 60px;
+        background: #d4af37;
+        margin: 15px auto;
+    }
+
+    .btn-outline-gold {
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        background: transparent;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        padding: 8px 20px;
+    }
+
+    .btn-outline-gold:hover {
+        background-color: #d4af37;
+        color: #000;
+    }
+
+    .italic { font-style: italic; }
+    .shadow-text { text-shadow: 2px 4px 6px rgba(0,0,0,0.5); }
+</style>

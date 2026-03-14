@@ -1,0 +1,212 @@
+@page "/booking"
+@using AppointmentSystem.Data
+@using AppointmentSystem.Models
+@inject ApplicationDbContext Db
+@rendermode InteractiveServer
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-5 mb-4">
+            <div class="card shadow border-gold bg-dark text-white">
+                <div class="card-header border-gold text-center py-3">
+                    <h4 class="mb-0 gold-text">Оформлення візиту</h4>
+                </div>
+                <div class="card-body">
+                    @if (showTicket && lastAppointment != null)
+                    {
+                        <div class="alert alert-dark shadow-sm mb-4 border-gold animated-fade-in" style="border-style: dashed !important;">
+                            <h5 class="alert-heading text-center gold-text">✅ ЗАПИСАНО</h5>
+                            <hr style="background-color: #d4af37;">
+                            <div class="small">
+                                <p><strong>Клієнт:</strong> @lastAppointment.PatientName</p>
+                                <p><strong>Майстер:</strong> @(Db.Doctors.Find(lastAppointment.DoctorId)?.Name)</p>
+                                <p><strong>Час:</strong> @lastAppointment.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</p>
+                            </div>
+                            <hr style="background-color: #d4af37;">
+                            <button class="btn btn-sm btn-outline-gold w-100" @onclick="() => showTicket = false">Новий запис</button>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label gold-text">Вибір майстра:</label>
+                        <select class="form-control bg-black text-white border-secondary" @bind="selectedDoctorId">
+                            <option value="0">-- Оберіть фахівця --</option>
+                            @foreach (var doctor in Db.Doctors.ToList())
+                            {
+                                <option value="@doctor.Id">@doctor.Name (@doctor.Specialization)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label gold-text">Ім'я клієнта:</label>
+                        <input type="text" class="form-control bg-black text-white border-secondary" @bind="patientName" placeholder="Ваше ім'я" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label gold-text">Дата та час:</label>
+                        <input type="datetime-local" class="form-control bg-black text-white border-secondary" 
+                               value="@appointmentTime.ToString("yyyy-MM-ddTHH:mm")" 
+                               @onchange="OnTimeChanged"
+                               step="1800"
+                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                        <div class="form-text text-secondary small mt-1 italic">
+                            Доступні сеанси: 09:00 – 19:00 (кожні 30 хв)
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger bg-black text-danger py-2 small border-danger">
+                            <i class="bi bi-exclamation-octagon"></i> @errorMessage
+                        </div>
+                    }
+
+                    <button class="btn btn-gold w-100 mt-2 py-2" @onclick="Save">
+                        ЗАПИСАТИСЯ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <h4 class="mb-3 gold-text">Журнал Aurum Studio</h4>
+            <div class="table-responsive rounded border-gold">
+                <table class="table table-dark table-hover mb-0 border-0">
+                    <thead>
+                        <tr class="gold-text border-bottom border-secondary">
+                            <th>Майстер</th>
+                            <th>Клієнт</th>
+                            <th>Дата / Час</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Db.Appointments.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-secondary py-4 italic">Наразі записів немає</td>
+                            </tr>
+                        }
+                        @foreach (var appt in Db.Appointments.OrderByDescending(a => a.AppointmentDate).ToList())
+                        {
+                            <tr class="align-middle">
+                                <td><span class="badge border border-gold gold-text bg-transparent">@appt.Doctor?.Name</span></td>
+                                <td class="text-light">@appt.PatientName</td>
+                                <td class="text-light">@appt.AppointmentDate.ToString("dd.MM HH:mm")</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-link text-secondary" @onclick="() => Delete(appt.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Локальні стилі для сторінки, щоб підтримати графітовий вигляд */
+    .border-gold { border: 1px solid #d4af37 !important; }
+    .bg-black { background-color: #0c0c0c !important; }
+    .gold-text { color: #d4af37 !important; }
+    .btn-gold { background-color: #d4af37 !important; color: #000 !important; font-weight: bold; border: none; }
+    .btn-gold:hover { background-color: #f1c40f !important; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+    .btn-outline-gold { border: 1px solid #d4af37; color: #d4af37; background: transparent; }
+    .btn-outline-gold:hover { background-color: #d4af37; color: #000; }
+    .italic { font-style: italic; }
+    
+    .animated-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+@code {
+    private int selectedDoctorId;
+    private string patientName = "";
+    private DateTime appointmentTime = DateTime.Now.Date.AddHours(10); 
+    private bool showTicket = false;
+    private string errorMessage = ""; 
+    private Appointment? lastAppointment;
+
+    private void OnTimeChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out DateTime dt))
+        {
+            // Округлення до кроку в 30 хвилин
+            int minutes = dt.Minute;
+            if (minutes < 15) minutes = 0;
+            else if (minutes < 45) minutes = 30;
+            else { dt = dt.AddHours(1); minutes = 0; }
+            
+            appointmentTime = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, minutes, 0);
+        }
+    }
+
+    private void Save()
+    {
+        errorMessage = ""; 
+
+        if (selectedDoctorId == 0 || string.IsNullOrEmpty(patientName))
+        {
+            errorMessage = "Будь ласка, заповніть усі дані.";
+            return;
+        }
+
+        // 1. Блокуємо неробочі години (9 - 19)
+        if (appointmentTime.Hour < 9 || appointmentTime.Hour >= 19)
+        {
+            errorMessage = "На жаль, у цей час студія зачинена (09:00 - 19:00).";
+            return;
+        }
+
+        if (appointmentTime < DateTime.Now)
+        {
+            errorMessage = "Неможливо здійснити запис на минулий час.";
+            return;
+        }
+
+        // 2. Перевірка на конфлікт часу
+        bool isBusy = Db.Appointments.Any(a => 
+            a.DoctorId == selectedDoctorId && 
+            a.AppointmentDate == appointmentTime);
+
+        if (isBusy)
+        {
+            errorMessage = "Цей часовий слот уже заброньовано. Оберіть інший.";
+            return;
+        }
+
+        lastAppointment = new Appointment 
+        { 
+            DoctorId = selectedDoctorId, 
+            AppointmentDate = appointmentTime, 
+            PatientName = patientName 
+        };
+        
+        Db.Appointments.Add(lastAppointment);
+        Db.SaveChanges();
+        
+        showTicket = true;
+        patientName = ""; 
+    }
+
+    private void Delete(int id)
+    {
+        var appt = Db.Appointments.Find(id);
+        if (appt != null)
+        {
+            Db.Appointments.Remove(appt);
+            Db.SaveChanges();
+            if (lastAppointment?.Id == id) showTicket = false;
+        }
+    }
+}

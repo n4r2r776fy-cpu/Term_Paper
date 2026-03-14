@@ -1,0 +1,71 @@
+﻿<div class="top-row ps-3 navbar navbar-dark bg-black border-bottom border-gold-thin">
+    <div class="container-fluid">
+        <a class="navbar-brand gold-text fw-bold" href="">
+            <i class="bi bi-gem me-2"></i>AURUM STUDIO
+        </a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').checked = false">
+    <nav class="flex-column mt-2">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link custom-nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill me-2" aria-hidden="true"></span> Головна
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link custom-nav-link" href="masters">
+                <span class="bi bi-people-fill me-2" aria-hidden="true"></span> Наші Майстри
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link custom-nav-link" href="booking">
+                <span class="bi bi-calendar-check-fill me-2" aria-hidden="true"></span> Запис на візит
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+<style>
+    /* Стилізація NavMenu під Aurum Studio */
+    .border-gold-thin {
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
+    }
+
+    .gold-text {
+        color: #d4af37 !important;
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+    }
+
+    .custom-nav-link {
+        color: #e0e0e0 !important;
+        margin: 5px 0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .custom-nav-link:hover {
+        background-color: rgba(212, 175, 55, 0.1) !important;
+        color: #d4af37 !important;
+    }
+
+    /* Стиль для активного пункту меню */
+    .custom-nav-link.active {
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        color: #d4af37 !important;
+        border-left: 3px solid #d4af37;
+    }
+
+    .bg-black {
+        background-color: #000000 !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+</style>

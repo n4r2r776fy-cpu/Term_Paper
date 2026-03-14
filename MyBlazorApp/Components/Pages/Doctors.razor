@@ -1,0 +1,74 @@
+@page "/doctors"
+@inject NavigationManager Navigation
+@inject MyBlazorApp.Services.AuthService AuthService
+
+<PageTitle>Doctors</PageTitle>
+
+<h2>Doctors</h2>
+
+<div class="doctors-list">
+    @foreach (var d in doctors)
+    {
+        <div class="doctor-card small">
+            <div class="doctor-header">
+                <img src="/lib/icons/avatar1.svg" alt="@d.Name" />
+                <div>
+                    <div class="name">@d.Name</div>
+                    <div class="status">@d.Status</div>
+                </div>
+            </div>
+            <div class="doctor-actions">
+                @if (d.IsServing)
+                {
+                    <button class="btn" @onclick="() => ToggleServing(d)">Complete Consultation</button>
+                }
+                else
+                {
+                    <button class="btn" @onclick="() => StartConsultation(d)">Start Consultation</button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<DoctorItem> doctors = new()
+    {
+        new DoctorItem("Erica Lim"),
+        new DoctorItem("Kevin Zane"),
+        new DoctorItem("Mina Park")
+    };
+
+    private void ToggleServing(DoctorItem d)
+    {
+        d.IsServing = !d.IsServing;
+        d.Status = d.IsServing ? "Serving patient" : "Not Serving Patient";
+    }
+
+    private void StartConsultation(DoctorItem d)
+    {
+        // If user not logged in, redirect to login first
+        if (!AuthService.IsLoggedIn)
+        {
+            var returnUrl = Uri.EscapeDataString($"/booking?doctor={Uri.EscapeDataString(d.Name)}");
+            Navigation.NavigateTo($"/login?returnUrl={returnUrl}");
+            return;
+        }
+
+        // Navigate to booking prefilled with doctor name
+        Navigation.NavigateTo($"/booking?doctor={Uri.EscapeDataString(d.Name)}");
+    }
+
+    private class DoctorItem
+    {
+        public string Name { get; set; }
+        public string Status { get; set; }
+        public bool IsServing { get; set; }
+        public DoctorItem(string name)
+        {
+            Name = name;
+            Status = "Not Serving Patient";
+            IsServing = false;
+        }
+    }
+}

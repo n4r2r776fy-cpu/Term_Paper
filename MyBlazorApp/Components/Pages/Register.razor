@@ -1,0 +1,79 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+@using MyBlazorApp.Models
+@page "/register"
+@inject MyBlazorApp.Services.DataService DataService
+@inject MyBlazorApp.Services.AuthService AuthService
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Реєстрація</PageTitle>
+
+<h1>Реєстрація</h1>
+
+<EditForm Model="@user" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Ім'я:</label>
+        <InputText id="name" @bind-Value="user.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="user.Email" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Пароль:</label>
+        <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
+    </div>
+
+    <div class="form-group">
+        <label for="confirm">Підтвердити пароль:</label>
+        <InputText id="confirm" @bind-Value="confirmPassword" class="form-control" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Зареєструватися</button>
+</EditForm>
+
+<p>Вже маєте акаунт? <a href="/login">Увійти</a></p>
+
+@code {
+    private User user = new();
+    private string confirmPassword = string.Empty;
+
+    private string? returnUrl;
+
+    protected override void OnInitialized()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var ru))
+        {
+            returnUrl = ru;
+        }
+    }
+
+    private void HandleRegister()
+    {
+        if (user.Password != confirmPassword) return;
+
+        if (DataService.RegisterUser(user))
+        {
+            AuthService.Login(user);
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                Navigation.NavigateTo(Uri.UnescapeDataString(returnUrl!));
+            }
+            else
+            {
+                Navigation.NavigateTo("/homepage");
+            }
+        }
+        else
+        {
+            // user exists - feedback could be added
+        }
+    }
+}

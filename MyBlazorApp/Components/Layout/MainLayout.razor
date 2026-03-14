@@ -1,0 +1,58 @@
+﻿@inherits LayoutComponentBase
+@inject MyBlazorApp.Services.AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="app-container">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main-content">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>Expresscare Medical Clinic</h1>
+                <span>Open</span>
+            </div>
+            <div class="header-right">
+                <input type="text" placeholder="Search" class="search-bar" />
+                <div class="header-icons">
+                    <img src="/lib/icons/notification-icon.svg" alt="Notifications" />
+                    <img src="/lib/icons/settings-icon.svg" alt="Settings" />
+                </div>
+
+                @if (!AuthService.IsLoggedIn)
+                {
+                    <div class="auth-buttons">
+                        <a class="btn btn-outline" href="/login">Вхід</a>
+                        <a class="btn btn-outline" href="/register">Реєстрація</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="user-info">
+                        <span>Вітаємо, @AuthService.CurrentUser?.Name</span>
+                        <button class="btn" @onclick="Logout">Вихід</button>
+                    </div>
+                }
+            </div>
+        </header>
+
+        <main class="content">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/homepage");
+    }
+}
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

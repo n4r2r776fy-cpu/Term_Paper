@@ -1,0 +1,115 @@
+@page "/homepage"
+
+<PageTitle>Home</PageTitle>
+
+<link href="css/HomePage.css" rel="stylesheet" />
+
+<div class="dashboard">
+    <div class="dashboard-left">
+        <section class="section doctors">
+            <h2>Doctors</h2>
+            <div class="cards-row">
+                <div class="doctor-card">
+                    <div class="doctor-header">
+                        <img src="/lib/icons/avatar1.svg" alt="Erica" />
+                        <div class="doctor-meta">
+                            <div class="name">Erica Lim</div>
+                            <div class="status">Not Serving Patient</div>
+                        </div>
+                    </div>
+                    <div class="patient-box">
+                        <div class="patient-name">Nick Young</div>
+                        <button class="btn action">Start Consultation</button>
+                    </div>
+                </div>
+
+                <div class="doctor-card">
+                    <div class="doctor-header">
+                        <img src="/lib/icons/avatar2.svg" alt="Kevin" />
+                        <div class="doctor-meta">
+                            <div class="name">Kevin Zane</div>
+                            <div class="status">Serving patient</div>
+                        </div>
+                    </div>
+                    <div class="patient-box">
+                        <div class="patient-name">Alina Choo</div>
+                        <button class="btn success">Complete Consultation</button>
+                    </div>
+                </div>
+            </div>
+            <a class="show-more" href="#">Show More Doctors</a>
+        </section>
+
+        <section class="section queue">
+            <h2>Queue</h2>
+            <div class="queue-box">
+                <div class="queue-tabs">
+                    <button class="tab active">Upcoming <span class="badge">3</span></button>
+                    <button class="tab">Missed <span class="badge">12</span></button>
+                </div>
+                <div class="queue-search">
+                    <input placeholder="Search" />
+                </div>
+
+                <div class="queue-cards">
+                    <div class="queue-card">
+                        <div class="q-left">
+                            <div class="avatar small">M</div>
+                            <div class="q-meta">
+                                <div class="q-name">Nick Young</div>
+                                <div class="q-sub">S9227486T — Confirmed</div>
+                            </div>
+                        </div>
+                        <div class="q-right">
+                            <div class="q-number">48</div>
+                            <button class="btn danger">Cancel Queue</button>
+                        </div>
+                    </div>
+                    <div class="queue-card">
+                        <div class="q-left">
+                            <div class="avatar small">I</div>
+                            <div class="q-meta">
+                                <div class="q-name">Muhammad Imran</div>
+                                <div class="q-sub">T0013984R — Not Confirmed</div>
+                            </div>
+                        </div>
+                        <div class="q-right">
+                            <div class="q-number">49</div>
+                            <button class="btn danger">Cancel Queue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <aside class="dashboard-right">
+        <section class="section checkout">
+            <h2>Checkout</h2>
+            <div class="checkout-card">
+                <div class="checkout-item">
+                    <div class="c-avatar">H</div>
+                    <div class="c-meta">
+                        <div class="c-name">Huisan Li</div>
+                        <div class="c-info">$37.05 — Not Paid</div>
+                    </div>
+                </div>
+                <button class="btn primary">Details</button>
+            </div>
+
+            <div class="checkout-card">
+                <div class="checkout-item">
+                    <div class="c-avatar">J</div>
+                    <div class="c-meta">
+                        <div class="c-name">Joe White</div>
+                        <div class="c-info">$34.05 — Paid</div>
+                    </div>
+                </div>
+                <button class="btn primary">Details</button>
+            </div>
+        </section>
+    </aside>
+</div>
+
+@code {
+}

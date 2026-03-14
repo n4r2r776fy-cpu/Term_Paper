@@ -1,0 +1,89 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+@page "/booking"
+@inject DataService DataService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Запис на прийом</PageTitle>
+
+@if (!AuthService.IsLoggedIn)
+{
+    <p>Будь ласка, <a href="/login">увійдіть</a> або <a href="/register">зареєструйтесь</a>, щоб записатися на прийом.</p>
+}
+else
+{
+    <h1>Записатися на прийом</h1>
+
+    <EditForm Model="@appointment" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Ім'я:</label>
+            <InputText id="name" @bind-Value="appointment.Name" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <InputText id="email" @bind-Value="appointment.Email" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Телефон:</label>
+            <InputText id="phone" @bind-Value="appointment.Phone" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="service">Послуга:</label>
+            <InputSelect id="service" @bind-Value="appointment.Service" class="form-control">
+                <option value="">Виберіть послугу</option>
+                <option value="therapist">Терапевт</option>
+                <option value="dentist">Стоматолог</option>
+                <option value="dermatologist">Дерматолог</option>
+            </InputSelect>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Дата:</label>
+            <InputDate id="date" @bind-Value="appointment.Date" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="time">Час:</label>
+            <InputText id="time" @bind-Value="appointment.Time" class="form-control" type="time" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Записатися</button>
+    </EditForm>
+}
+
+@code {
+    private Appointment appointment = new();
+
+    protected override void OnInitialized()
+    {
+        // Pre-fill doctor from query string if present
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("doctor", out var doctor))
+        {
+            // store doctor in Service field to show to user (optional)
+            appointment.Service = doctor;
+        }
+        if (AuthService.IsLoggedIn)
+        {
+            appointment.Name = AuthService.CurrentUser!.Name;
+            appointment.Email = AuthService.CurrentUser.Email;
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (!AuthService.IsLoggedIn) return;
+
+        appointment.UserEmail = AuthService.CurrentUser!.Email;
+        DataService.AddAppointment(appointment);
+        Navigation.NavigateTo("/homepage");
+    }
+}

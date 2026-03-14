@@ -1,0 +1,77 @@
+@page "/appointments"
+@using MyBlazorApp.Models
+@inject DataService DataService
+
+<PageTitle>Список записів</PageTitle>
+
+<h1>Список записів</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ім'я клієнта</th>
+            <th>Email</th>
+            <th>Телефон</th>
+            <th>Послуга</th>
+            <th>Дата</th>
+            <th>Час</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appointment in Appointments)
+        {
+            <tr>
+                <td>@appointment.Name</td>
+                <td>@appointment.Email</td>
+                <td>@appointment.Phone</td>
+                <td>@appointment.Service</td>
+                <td>@appointment.Date.ToShortDateString()</td>
+                <td>@appointment.Time</td>
+                <td>
+                    <button class="btn btn-danger" @onclick="() => DeleteAppointment(appointment.Id)">Видалити</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="AddAppointment">Додати запис</button>
+
+@code {
+    private List<Appointment> Appointments = new List<Appointment>();
+
+    protected override void OnInitialized()
+    {
+        // Завантаження списку записів
+        Appointments = DataService.GetAppointments();
+    }
+
+    private void AddAppointment()
+    {
+        // Логіка для додавання нового запису
+        var newAppointment = new Appointment
+        {
+            Name = "Новий клієнт",
+            Email = "example@example.com",
+            Phone = "123456789",
+            Service = "Послуга",
+            Date = DateTime.Now,
+            Time = "10:00"
+        };
+
+        Appointments.Add(newAppointment);
+        DataService.SaveAppointment(newAppointment);
+    }
+
+    private void DeleteAppointment(int id)
+    {
+        // Логіка для видалення запису
+        var appointment = Appointments.FirstOrDefault(a => a.Id == id);
+        if (appointment != null)
+        {
+            Appointments.Remove(appointment);
+            DataService.DeleteAppointment(id);
+        }
+    }
+}

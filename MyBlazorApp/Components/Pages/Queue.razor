@@ -1,0 +1,55 @@
+@page "/queue"
+@inject MyBlazorApp.Services.DataService DataService
+
+<PageTitle>Queue</PageTitle>
+
+<h2>Queue</h2>
+
+<div class="queue-controls">
+    <input placeholder="Search in queue..." @bind="search" />
+    <div class="tabs">
+        <button class="tab @(showMissed ? "" : "active")" @onclick="() => ToggleTab(false)">Upcoming</button>
+        <button class="tab @(showMissed ? "active" : "")" @onclick="() => ToggleTab(true)">Missed</button>
+    </div>
+}</div>
+
+<div class="queue-list">
+    @foreach (var appt in filtered)
+    {
+        <div class="queue-card">
+            <div>
+                <div class="q-name">@appt.Name</div>
+                <div class="q-sub">@appt.Service — @appt.Date.ToShortDateString()</div>
+            </div>
+            <div class="q-actions">
+                <button class="btn danger" @onclick="() => Cancel(appt.Id)">Cancel Queue</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string search = string.Empty;
+    private bool showMissed = false;
+    private List<MyBlazorApp.Models.Appointment> all = new();
+
+    protected override void OnInitialized()
+    {
+        all = DataService.GetAppointments();
+    }
+
+    private IEnumerable<MyBlazorApp.Models.Appointment> filtered => all
+        .Where(a => (showMissed ? a.Date.Date < DateTime.Today : a.Date.Date >= DateTime.Today))
+        .Where(a => string.IsNullOrWhiteSpace(search) || a.Name!.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+    private void ToggleTab(bool missed)
+    {
+        showMissed = missed;
+    }
+
+    private void Cancel(int id)
+    {
+        DataService.DeleteAppointment(id);
+        all = DataService.GetAppointments();
+    }
+}

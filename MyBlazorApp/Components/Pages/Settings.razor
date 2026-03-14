@@ -1,0 +1,32 @@
+@page "/settings"
+@inject MyBlazorApp.Services.AuthService AuthService
+@inject MyBlazorApp.Services.DataService DataService
+@inject NavigationManager Navigation
+
+<PageTitle>Settings</PageTitle>
+
+<h2>Settings</h2>
+
+@if (!AuthService.IsLoggedIn)
+{
+    <p>You are not logged in.</p>
+    <a href="/login">Login</a>
+}
+else
+{
+    <div class="profile-card">
+        <div><strong>Name:</strong> @AuthService.CurrentUser?.Name</div>
+        <div><strong>Email:</strong> @AuthService.CurrentUser?.Email</div>
+        <div class="settings-actions">
+            <button class="btn" @onclick="Logout">Logout</button>
+        </div>
+    </div>
+}
+
+@code {
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/homepage");
+    }
+}

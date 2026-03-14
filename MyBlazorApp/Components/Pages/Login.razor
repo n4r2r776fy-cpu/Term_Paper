@@ -1,0 +1,72 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+@page "/login"
+@inject MyBlazorApp.Services.DataService DataService
+@inject MyBlazorApp.Services.AuthService AuthService
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Вхід</PageTitle>
+
+<h1>Вхід</h1>
+
+<EditForm Model="@model" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="model.Email" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Пароль:</label>
+        <InputText id="password" @bind-Value="model.Password" class="form-control" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Увійти</button>
+</EditForm>
+
+<p>Немає акаунту? <a href="/register">Зареєструватися</a></p>
+
+@code {
+    private LoginModel model = new();
+
+    private string? returnUrl;
+
+    protected override void OnInitialized()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var ru))
+        {
+            returnUrl = ru;
+        }
+    }
+
+    private void HandleLogin()
+    {
+        var user = DataService.LoginUser(model.Email ?? string.Empty, model.Password ?? string.Empty);
+        if (user != null)
+        {
+            AuthService.Login(user);
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                Navigation.NavigateTo(Uri.UnescapeDataString(returnUrl!));
+            }
+            else
+            {
+                Navigation.NavigateTo("/homepage");
+            }
+        }
+        else
+        {
+            // Simple feedback could be added
+        }
+    }
+
+    private class LoginModel
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+    }
+}

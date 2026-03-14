@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj": {}
+    "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj": {
+    "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
+        "projectUniqueName": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
         "projectName": "MyBlazorApp.Tests",
-        "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
+        "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
         "packagesPath": "C:\\Users\\romag\\.nuget\\packages\\",
-        "outputPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\obj\\",
+        "outputPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\romag\\AppData\\Roaming\\NuGet\\NuGet.Config",

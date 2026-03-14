@@ -94,8 +94,8 @@ public class DataServiceTests
             Name = "Bella",
             Email = "bella@example.com",
             Phone = "+380000000002",
-            Service = "Терапевтична консультація",
-            DoctorName = "Erica Lim",
+            Service = "Стоматологічний огляд",
+            DoctorName = "Kevin Zane",
             Date = DateTime.Today,
             Time = "08:15"
         });
@@ -106,6 +106,37 @@ public class DataServiceTests
             .ToList();
 
         Assert.Equal(new[] { "Aaron", "Bella" }, sameSlot);
+    }
+
+    [Fact]
+    public void GetServicesForDoctor_ReturnsServicesMappedToDoctorSpecialty()
+    {
+        using var context = new TestDataServiceContext();
+
+        var services = context.DataService.GetServicesForDoctor("Mina Park");
+
+        Assert.Equal(new[] { "Дерматологічна консультація" }, services);
+    }
+
+    [Fact]
+    public void IsDoctorAvailable_ReturnsFalseWhenSlotIsAlreadyOccupied()
+    {
+        using var context = new TestDataServiceContext();
+
+        var isAvailable = context.DataService.IsDoctorAvailable("Erica Lim", DateTime.Today.AddDays(1), "09:30");
+
+        Assert.False(isAvailable);
+    }
+
+    [Fact]
+    public void GetAvailableTimeSlots_ExcludesOccupiedDoctorSlots()
+    {
+        using var context = new TestDataServiceContext();
+
+        var slots = context.DataService.GetAvailableTimeSlots("Erica Lim", DateTime.Today.AddDays(1));
+
+        Assert.DoesNotContain("09:30", slots);
+        Assert.Contains("09:00", slots);
     }
 
     [Fact]
@@ -128,6 +159,24 @@ public class DataServiceTests
         context.DataService.SaveAppointment(appointment);
 
         Assert.Contains(context.DataService.GetAppointments(), item => item.Name == "Saved Patient");
+    }
+
+    [Fact]
+    public void SaveAppointment_ThrowsWhenDoctorSlotIsAlreadyTaken()
+    {
+        using var context = new TestDataServiceContext();
+        var appointment = new Appointment
+        {
+            Name = "Conflicting Patient",
+            Email = "conflict@example.com",
+            Phone = "+380999999998",
+            Service = "Терапевтична консультація",
+            DoctorName = "Erica Lim",
+            Date = DateTime.Today.AddDays(1),
+            Time = "09:30"
+        };
+
+        Assert.Throws<InvalidOperationException>(() => context.DataService.SaveAppointment(appointment));
     }
 
     [Fact]
@@ -174,7 +223,15 @@ public class DataServiceTests
     public void SaveAppointment_AssignsCalculatedPriceForZeroPrice(string service, decimal expectedPrice)
     {
         using var context = new TestDataServiceContext();
-        var appointment = CreateAppointment(service: service, price: 0);
+        var appointment = CreateAppointment(
+            service: service,
+            doctorName: service switch
+            {
+                "Стоматологічний огляд" => "Kevin Zane",
+                "Дерматологічна консультація" => "Mina Park",
+                _ => "Erica Lim"
+            },
+            price: 0);
 
         context.DataService.SaveAppointment(appointment);
 
@@ -213,6 +270,7 @@ public class DataServiceTests
         using var context = new TestDataServiceContext();
         var appointment = context.DataService.GetAppointments().First();
         appointment.Service = "Стоматологічний огляд";
+        appointment.DoctorName = "Kevin Zane";
         appointment.Price = 0;
 
         context.DataService.UpdateAppointment(appointment);
@@ -389,6 +447,7 @@ public class DataServiceTests
     private static Appointment CreateAppointment(
         string name = "Test Patient",
         string service = "Терапевтична консультація",
+        string doctorName = "Erica Lim",
         decimal price = 0m) =>
         new()
         {
@@ -396,7 +455,7 @@ public class DataServiceTests
             Email = "patient@example.com",
             Phone = "+380999999999",
             Service = service,
-            DoctorName = "Erica Lim",
+            DoctorName = doctorName,
             Date = DateTime.Today.AddDays(2),
             Time = "10:00",
             Price = price

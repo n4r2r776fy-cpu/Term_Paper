@@ -8,6 +8,20 @@ namespace MyBlazorApp.Services
 {
     public class DataService
     {
+        private static readonly string[] StandardTimeSlots =
+        {
+            "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+            "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+            "15:00", "15:30", "16:00", "16:30", "17:00"
+        };
+
+        private static readonly Dictionary<string, string[]> ServicesBySpecialty = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Терапевт"] = new[] { "Терапевтична консультація" },
+            ["Стоматолог"] = new[] { "Стоматологічний огляд" },
+            ["Дерматолог"] = new[] { "Дерматологічна консультація" }
+        };
+
         private readonly string _appointmentsFilePath;
         private readonly string _usersFilePath;
         private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
@@ -41,8 +55,66 @@ namespace MyBlazorApp.Services
                 .ToList();
         }
 
+        public IReadOnlyList<string> GetServicesForDoctor(string? doctorName)
+        {
+            var specialty = GetDoctors()
+                .FirstOrDefault(doctor => doctor.Name.Equals(doctorName ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                ?.Specialty;
+
+            if (string.IsNullOrWhiteSpace(specialty) || !ServicesBySpecialty.TryGetValue(specialty, out var services))
+            {
+                return Array.Empty<string>();
+            }
+
+            return services;
+        }
+
+        public IReadOnlyList<string> GetAvailableTimeSlots(string? doctorName, DateTime date, int? excludingAppointmentId = null)
+        {
+            if (string.IsNullOrWhiteSpace(doctorName))
+            {
+                return Array.Empty<string>();
+            }
+
+            return StandardTimeSlots
+                .Where(time => IsFutureOrCurrentSlot(date, time))
+                .Where(time => IsDoctorAvailable(doctorName, date, time, excludingAppointmentId))
+                .ToList();
+        }
+
+        public bool IsDoctorAvailable(string? doctorName, DateTime date, string? time, int? excludingAppointmentId = null)
+        {
+            if (string.IsNullOrWhiteSpace(doctorName) || string.IsNullOrWhiteSpace(time))
+            {
+                return false;
+            }
+
+            var normalizedDate = date.Date;
+            var normalizedTime = time.Trim();
+
+            return GetAppointments().All(appointment =>
+                appointment.Id == excludingAppointmentId
+                || appointment.Status == AppointmentStatuses.Cancelled
+                || !appointment.DoctorName.Equals(doctorName, StringComparison.OrdinalIgnoreCase)
+                || appointment.Date.Date != normalizedDate
+                || !string.Equals(appointment.Time, normalizedTime, StringComparison.OrdinalIgnoreCase));
+        }
+
         public void SaveAppointment(Appointment appointment)
         {
+            NormalizeAppointment(appointment);
+
+            if (!IsDoctorAvailable(appointment.DoctorName, appointment.Date, appointment.Time))
+            {
+                throw new InvalidOperationException("Обраний час уже зайнятий. Будь ласка, виберіть інший слот.");
+            }
+
+            var allowedServices = GetServicesForDoctor(appointment.DoctorName);
+            if (IsKnownService(appointment.Service) && allowedServices.Count > 0 && !allowedServices.Contains(appointment.Service ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Обрана послуга недоступна для цього лікаря.");
+            }
+
             var appointments = GetAppointments();
             appointment.Id = appointments.Any() ? appointments.Max(a => a.Id) + 1 : 1;
             appointment.CreatedAt = DateTime.Now;
@@ -54,11 +126,24 @@ namespace MyBlazorApp.Services
 
         public void UpdateAppointment(Appointment appointment)
         {
+            NormalizeAppointment(appointment);
+
             var appointments = GetAppointments();
             var index = appointments.FindIndex(a => a.Id == appointment.Id);
             if (index < 0)
             {
                 return;
+            }
+
+            if (!IsDoctorAvailable(appointment.DoctorName, appointment.Date, appointment.Time, appointment.Id))
+            {
+                throw new InvalidOperationException("Обраний час уже зайнятий. Будь ласка, виберіть інший слот.");
+            }
+
+            var allowedServices = GetServicesForDoctor(appointment.DoctorName);
+            if (IsKnownService(appointment.Service) && allowedServices.Count > 0 && !allowedServices.Contains(appointment.Service ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Обрана послуга недоступна для цього лікаря.");
             }
 
             appointment.Price = ResolvePrice(appointment.Service, appointment.Price);
@@ -227,6 +312,32 @@ namespace MyBlazorApp.Services
             return TimeSpan.TryParse(value, out var parsed)
                 ? parsed
                 : TimeSpan.Zero;
+        }
+
+        private static bool IsFutureOrCurrentSlot(DateTime date, string time)
+        {
+            if (!TimeSpan.TryParse(time, out var parsedTime))
+            {
+                return false;
+            }
+
+            var appointmentMoment = date.Date.Add(parsedTime);
+            return appointmentMoment >= DateTime.Now;
+        }
+
+        private static bool IsKnownService(string? service) => ServicesBySpecialty.Values
+            .SelectMany(items => items)
+            .Contains(service ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+
+        private static void NormalizeAppointment(Appointment appointment)
+        {
+            appointment.Name = appointment.Name.Trim();
+            appointment.Email = appointment.Email.Trim();
+            appointment.Phone = appointment.Phone.Trim();
+            appointment.DoctorName = appointment.DoctorName.Trim();
+            appointment.Service = appointment.Service?.Trim();
+            appointment.Time = appointment.Time.Trim();
+            appointment.Date = appointment.Date.Date;
         }
     }
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BWDb8sNkhF4=",
+  "dgSpecHash": "5WK60uqj0S0=",
   "success": true,
-  "projectFilePath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+  "projectFilePath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.5\\microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512"
   ],

@@ -159,6 +159,17 @@ public class ModelValidationTests
         Assert.Contains(result.Errors, error => error.ErrorMessage == expectedError);
     }
 
+    [Fact]
+    public void Appointment_RejectsPastDate()
+    {
+        var appointment = CreateValidAppointment();
+        appointment.Date = DateTime.Today.AddDays(-1);
+
+        var result = Validate(appointment);
+
+        Assert.Contains(result.Errors, error => error.ErrorMessage == "Дата запису не може бути в минулому");
+    }
+
     [Theory]
     [InlineData(AppointmentStatuses.Upcoming)]
     [InlineData(AppointmentStatuses.Completed)]

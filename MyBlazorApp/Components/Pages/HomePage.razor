@@ -74,18 +74,18 @@
 
             <div class="queue-box">
                 <div class="queue-tabs">
-                    <button class="tab active">Upcoming <span class="badge">@upcomingAppointments.Count</span></button>
-                    <button class="tab">Missed <span class="badge">@missedAppointments.Count</span></button>
+                    <button class="tab @(showMissedQueue ? string.Empty : "active")" @onclick="() => ShowQueue(false)">Upcoming <span class="badge">@upcomingAppointments.Count</span></button>
+                    <button class="tab @(showMissedQueue ? "active" : string.Empty)" @onclick="() => ShowQueue(true)">Missed <span class="badge">@missedAppointments.Count</span></button>
                 </div>
 
                 <div class="queue-cards column-list">
-                    @if (upcomingAppointments.Count == 0)
+                    @if (VisibleQueueAppointments.Count == 0)
                     {
-                        <div class="empty-state">Поки що немає активних записів.</div>
+                        <div class="empty-state">@(showMissedQueue ? "Немає пропущених записів." : "Поки що немає активних записів.")</div>
                     }
                     else
                     {
-                        @foreach (var item in upcomingAppointments.Take(4).Select((appointment, index) => new { appointment, index }))
+                        @foreach (var item in VisibleQueueAppointments.Take(4).Select((appointment, index) => new { appointment, index }))
                         {
                             <div class="queue-card">
                                 <div class="q-left">
@@ -97,7 +97,14 @@
                                 </div>
                                 <div class="q-right compact-right">
                                     <div class="q-number">#@(item.index + 1)</div>
-                                    <button class="btn danger" @onclick='() => RemoveAppointment(item.appointment.Id)'>Скасувати</button>
+                                    @if (showMissedQueue)
+                                    {
+                                        <button class="btn action" @onclick='() => OpenBooking(item.appointment.DoctorName)'>Записатися знову</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn danger" @onclick='() => RemoveAppointment(item.appointment.Id)'>Скасувати</button>
+                                    }
                                 </div>
                             </div>
                         }
@@ -147,6 +154,11 @@
     private List<Appointment> upcomingAppointments = new();
     private List<Appointment> missedAppointments = new();
     private List<Appointment> checkoutAppointments = new();
+    private bool showMissedQueue;
+
+    private IReadOnlyList<Appointment> VisibleQueueAppointments => showMissedQueue
+        ? missedAppointments
+        : upcomingAppointments;
 
     protected override void OnInitialized()
     {
@@ -196,5 +208,10 @@
     {
         DataService.TogglePaid(id);
         LoadData();
+    }
+
+    private void ShowQueue(bool showMissed)
+    {
+        showMissedQueue = showMissed;
     }
 }

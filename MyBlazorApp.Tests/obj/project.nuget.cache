@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mm/asNAY5Rc=",
+  "dgSpecHash": "OiNdtZxabhA=",
   "success": true,
-  "projectFilePath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
+  "projectFilePath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp.Tests\\MyBlazorApp.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\romag\\.nuget\\packages\\coverlet.collector\\6.0.4\\coverlet.collector.6.0.4.nupkg.sha512",
     "C:\\Users\\romag\\.nuget\\packages\\microsoft.codecoverage\\18.0.0\\microsoft.codecoverage.18.0.0.nupkg.sha512",

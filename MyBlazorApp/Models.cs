@@ -26,7 +26,7 @@ namespace MyBlazorApp.Models
         public string Password { get; set; } = "";
     }
 
-    public class Appointment 
+    public class Appointment : IValidatableObject
     {
         public int Id { get; set; }
 
@@ -49,6 +49,7 @@ namespace MyBlazorApp.Models
         public DateTime Date { get; set; } = DateTime.Today;
 
         [Required(ErrorMessage = "Час є обов'язковим")]
+        [RegularExpression(@"^\d{2}:\d{2}$", ErrorMessage = "Час має бути у форматі ГГ:ХХ")]
         public string Time { get; set; } = "";
     
 
@@ -61,6 +62,14 @@ namespace MyBlazorApp.Models
             public decimal Price { get; set; }
 
             public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            {
+                if (Date.Date < DateTime.Today)
+                {
+                    yield return new ValidationResult("Дата запису не може бути в минулому", new[] { nameof(Date) });
+                }
+            }
     }
 
         public class Doctor

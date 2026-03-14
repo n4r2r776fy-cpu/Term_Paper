@@ -1,72 +1,67 @@
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components
 @page "/login"
-@inject MyBlazorApp.Services.DataService DataService
-@inject MyBlazorApp.Services.AuthService AuthService
-@inject NavigationManager Navigation
+@using MyBlazorApp.Services
+@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.WebUtilities
+@inject AuthService AuthService
+@inject NavigationManager Navigation
 
 <PageTitle>Вхід</PageTitle>
 
 <h1>Вхід</h1>
 
-<EditForm Model="@model" OnValidSubmit="HandleLogin">
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
         <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="model.Email" class="form-control" />
+        <InputText id="email" @bind-Value="loginModel.Email" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="password">Пароль:</label>
-        <InputText id="password" @bind-Value="model.Password" class="form-control" type="password" />
+        <InputText id="password" @bind-Value="loginModel.Password" class="form-control" type="password" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Увійти</button>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
+
+    <button type="submit" class="btn btn-primary mt-3">Увійти</button>
 </EditForm>
 
-<p>Немає акаунту? <a href="/register">Зареєструватися</a></p>
-
 @code {
-    private LoginModel model = new();
-
-    private string? returnUrl;
+    private LoginModel loginModel = new();
+    private string? errorMessage;
+    private string returnUrl = "/homepage";
 
     protected override void OnInitialized()
     {
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var ru))
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var value)
+            && !string.IsNullOrWhiteSpace(value))
         {
-            returnUrl = ru;
+            returnUrl = value.ToString();
         }
     }
 
     private void HandleLogin()
     {
-        var user = DataService.LoginUser(model.Email ?? string.Empty, model.Password ?? string.Empty);
-        if (user != null)
+        errorMessage = null;
+        if (AuthService.Login(loginModel.Email, loginModel.Password))
         {
-            AuthService.Login(user);
-            if (!string.IsNullOrEmpty(returnUrl))
-            {
-                Navigation.NavigateTo(Uri.UnescapeDataString(returnUrl!));
-            }
-            else
-            {
-                Navigation.NavigateTo("/homepage");
-            }
+            Navigation.NavigateTo(returnUrl);
         }
         else
         {
-            // Simple feedback could be added
+            errorMessage = "Неправильний email або пароль.";
         }
     }
 
     private class LoginModel
     {
-        public string? Email { get; set; }
-        public string? Password { get; set; }
+        [Required(ErrorMessage = "Email є обов'язковим")] public string Email { get; set; } = "";
+        [Required(ErrorMessage = "Пароль є обов'язковим")] public string Password { get; set; } = "";
     }
 }

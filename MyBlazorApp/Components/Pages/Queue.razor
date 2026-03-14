@@ -1,46 +1,74 @@
 @page "/queue"
-@inject MyBlazorApp.Services.DataService DataService
+@inject DataService DataService
 
-<PageTitle>Queue</PageTitle>
+<PageTitle>Черга</PageTitle>
 
-<h2>Queue</h2>
+<h2>Черга записів</h2>
 
 <div class="queue-controls">
     <input placeholder="Search in queue..." @bind="search" />
     <div class="tabs">
-        <button class="tab @(showMissed ? "" : "active")" @onclick="() => ToggleTab(false)">Upcoming</button>
-        <button class="tab @(showMissed ? "active" : "")" @onclick="() => ToggleTab(true)">Missed</button>
+        <button class="tab @(showMissed ? "" : "active")" @onclick="() => ToggleTab(false)">Upcoming (@upcomingCount)</button>
+        <button class="tab @(showMissed ? "active" : "")" @onclick="() => ToggleTab(true)">Missed (@missedCount)</button>
     </div>
-}</div>
+</div>
 
 <div class="queue-list">
-    @foreach (var appt in filtered)
+    @if (!filtered.Any())
     {
-        <div class="queue-card">
-            <div>
-                <div class="q-name">@appt.Name</div>
-                <div class="q-sub">@appt.Service — @appt.Date.ToShortDateString()</div>
+        <div class="empty-state">Немає записів для вибраного фільтра.</div>
+    }
+    else
+    {
+        @foreach (var item in filtered.Select((appointment, index) => new { appointment, index }))
+        {
+            <div class="queue-card">
+                <div>
+                    <div class="q-name">#@(item.index + 1) · @item.appointment.Name</div>
+                    <div class="q-sub">@item.appointment.DoctorName · @item.appointment.Service · @item.appointment.Date.ToString("dd.MM.yyyy") @item.appointment.Time</div>
+                </div>
+                <div class="q-actions">
+                    <button class="btn danger" @onclick="() => Cancel(item.appointment.Id)">Видалити</button>
+                </div>
             </div>
-            <div class="q-actions">
-                <button class="btn danger" @onclick="() => Cancel(appt.Id)">Cancel Queue</button>
-            </div>
-        </div>
+        }
     }
 </div>
 
 @code {
     private string search = string.Empty;
     private bool showMissed = false;
-    private List<MyBlazorApp.Models.Appointment> all = new();
+    private List<Appointment> all = new();
+    private int upcomingCount;
+    private int missedCount;
 
     protected override void OnInitialized()
     {
-        all = DataService.GetAppointments();
+        LoadData();
     }
 
-    private IEnumerable<MyBlazorApp.Models.Appointment> filtered => all
-        .Where(a => (showMissed ? a.Date.Date < DateTime.Today : a.Date.Date >= DateTime.Today))
-        .Where(a => string.IsNullOrWhiteSpace(search) || a.Name!.Contains(search, StringComparison.OrdinalIgnoreCase));
+    private IEnumerable<Appointment> filtered => all
+        .Where(a => showMissed ? IsMissed(a) : IsUpcoming(a))
+        .Where(a => string.IsNullOrWhiteSpace(search)
+            || a.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || a.DoctorName.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || (a.Service?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    private void LoadData()
+    {
+        all = DataService.GetAppointments();
+        upcomingCount = all.Count(IsUpcoming);
+        missedCount = all.Count(IsMissed);
+    }
+
+    private static bool IsUpcoming(Appointment appointment) =>
+        appointment.Status != AppointmentStatuses.Cancelled
+        && appointment.Status != AppointmentStatuses.Missed
+        && appointment.Date.Date >= DateTime.Today;
+
+    private static bool IsMissed(Appointment appointment) =>
+        appointment.Status == AppointmentStatuses.Missed
+        || (appointment.Status != AppointmentStatuses.Cancelled && appointment.Date.Date < DateTime.Today);
 
     private void ToggleTab(bool missed)
     {
@@ -50,6 +78,6 @@
     private void Cancel(int id)
     {
         DataService.DeleteAppointment(id);
-        all = DataService.GetAppointments();
+        LoadData();
     }
 }

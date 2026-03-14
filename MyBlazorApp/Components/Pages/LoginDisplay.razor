@@ -1,0 +1,29 @@
+@implements IDisposable
+@using MyBlazorApp.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="login-display">
+    @if (AuthService.IsLoggedIn)
+    {
+        <span>Привіт, @AuthService.CurrentUser?.Name!</span>
+        <button class="btn btn-link" @onclick="Logout">Вийти</button>
+    }
+    else
+    {
+        <a href="/register">Реєстрація</a>
+        <a href="/login">Вхід</a>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => AuthService.OnChange += StateHasChanged;
+
+    public void Dispose() => AuthService.OnChange -= StateHasChanged;
+
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/");
+    }
+}

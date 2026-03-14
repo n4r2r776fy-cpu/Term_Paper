@@ -1,10 +1,11 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.WebUtilities
+@using MyBlazorApp.Models
 @page "/booking"
 @inject DataService DataService
 @inject AuthService AuthService
 @inject NavigationManager Navigation
-@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Запис на прийом</PageTitle>
 
@@ -36,13 +37,26 @@ else
         </div>
 
         <div class="form-group">
+            <label for="doctor">Лікар:</label>
+            <InputSelect id="doctor" @bind-Value="appointment.DoctorName" class="form-control">
+                <option value="">Виберіть лікаря</option>
+                @foreach (var doctor in doctors)
+                {
+                    <option value="@doctor.Name">@doctor.Name (@doctor.Specialty)</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => appointment.DoctorName)" />
+        </div>
+
+        <div class="form-group">
             <label for="service">Послуга:</label>
             <InputSelect id="service" @bind-Value="appointment.Service" class="form-control">
                 <option value="">Виберіть послугу</option>
-                <option value="therapist">Терапевт</option>
-                <option value="dentist">Стоматолог</option>
-                <option value="dermatologist">Дерматолог</option>
+                <option value="Терапевтична консультація">Терапевтична консультація</option>
+                <option value="Стоматологічний огляд">Стоматологічний огляд</option>
+                <option value="Дерматологічна консультація">Дерматологічна консультація</option>
             </InputSelect>
+            <ValidationMessage For="@(() => appointment.Service)" />
         </div>
 
         <div class="form-group">
@@ -61,16 +75,18 @@ else
 
 @code {
     private Appointment appointment = new();
+    private IReadOnlyList<Doctor> doctors = Array.Empty<Doctor>();
 
     protected override void OnInitialized()
     {
-        // Pre-fill doctor from query string if present
+        doctors = DataService.GetDoctors();
+
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("doctor", out var doctor))
         {
-            // store doctor in Service field to show to user (optional)
-            appointment.Service = doctor;
+            appointment.DoctorName = doctor.ToString();
         }
+
         if (AuthService.IsLoggedIn)
         {
             appointment.Name = AuthService.CurrentUser!.Name;
@@ -80,10 +96,14 @@ else
 
     private void HandleValidSubmit()
     {
-        if (!AuthService.IsLoggedIn) return;
+        if (!AuthService.IsLoggedIn)
+        {
+            return;
+        }
 
         appointment.UserEmail = AuthService.CurrentUser!.Email;
-        DataService.AddAppointment(appointment);
-        Navigation.NavigateTo("/homepage");
+        appointment.Status = AppointmentStatuses.Upcoming;
+        DataService.SaveAppointment(appointment);
+        Navigation.NavigateTo("/appointments");
     }
 }

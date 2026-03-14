@@ -1,0 +1,47 @@
+[
+  {
+    "Id": 1,
+    "Name": "Nick Young",
+    "Email": "nick@example.com",
+    "Phone": "\u002B380501112233",
+    "Service": "\u0422\u0435\u0440\u0430\u043F\u0435\u0432\u0442\u0438\u0447\u043D\u0430 \u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0456\u044F",
+    "DoctorName": "Erica Lim",
+    "Date": "2026-03-15T00:00:00+02:00",
+    "Time": "09:30",
+    "UserEmail": "demo@clinic.local",
+    "Status": "Upcoming",
+    "Paid": false,
+    "Price": 600,
+    "CreatedAt": "2026-03-12T00:00:00+02:00"
+  },
+  {
+    "Id": 2,
+    "Name": "Alina Choo",
+    "Email": "alina@example.com",
+    "Phone": "\u002B380661234567",
+    "Service": "\u0421\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u0447\u043D\u0438\u0439 \u043E\u0433\u043B\u044F\u0434",
+    "DoctorName": "Kevin Zane",
+    "Date": "2026-03-14T00:00:00+02:00",
+    "Time": "12:00",
+    "UserEmail": "demo@clinic.local",
+    "Status": "Upcoming",
+    "Paid": true,
+    "Price": 850,
+    "CreatedAt": "2026-03-13T00:00:00+02:00"
+  },
+  {
+    "Id": 3,
+    "Name": "Maya Foster",
+    "Email": "maya@example.com",
+    "Phone": "\u002B380971234567",
+    "Service": "\u0414\u0435\u0440\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u0447\u043D\u0430 \u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0456\u044F",
+    "DoctorName": "Mina Park",
+    "Date": "2026-03-13T00:00:00+02:00",
+    "Time": "15:45",
+    "UserEmail": "demo@clinic.local",
+    "Status": "Missed",
+    "Paid": false,
+    "Price": 700,
+    "CreatedAt": "2026-03-10T00:00:00+02:00"
+  }
+]

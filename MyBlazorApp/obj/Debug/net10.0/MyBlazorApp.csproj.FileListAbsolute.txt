@@ -2,7 +2,6 @@ D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\appsetti
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\appsettings.json
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.staticwebassets.runtime.json
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.staticwebassets.endpoints.json
-D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.exe
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.deps.json
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.runtimeconfig.json
 D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.dll
@@ -84,7 +83,6 @@ D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\MyBlazor
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\MyBlazorApp.genruntimeconfig.cache
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\ref\MyBlazorApp.dll
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\m6qanne3o3-{0}-td1yk0zz2w-td1yk0zz2w.gz
-D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\kur5ab7fq2-{0}-pnx4vbhoqf-pnx4vbhoqf.gz
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\wc3km3tmen-{0}-1zac9v1ig9-1zac9v1ig9.gz
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\2entdzq22n-{0}-6cg5z5pcf4-6cg5z5pcf4.gz
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\vv8ii4ghfi-{0}-fau35k6ity-fau35k6ity.gz
@@ -93,3 +91,7 @@ D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compress
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\pt5covhwst-{0}-a8gpu3ywqh-a8gpu3ywqh.gz
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\0xcu0v4mhc-{0}-d1a1y5jghg-d1a1y5jghg.gz
 D:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\l8atntwwzz-{0}-h5lytuhpqo-h5lytuhpqo.gz
+D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\MyBlazorApp.exe
+d:\Курсова Робота\Term_Paper\MyBlazorApp\obj\Debug\net10.0\compressed\kur5ab7fq2-{0}-x5j4ibsn93-x5j4ibsn93.gz
+D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\App_Data\appointments.json
+D:\Курсова Робота\Term_Paper\MyBlazorApp\bin\Debug\net10.0\App_Data\users.json

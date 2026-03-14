@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {}
+    "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {}
   },
   "projects": {
-    "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
+    "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+        "projectUniqueName": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
         "projectName": "MyBlazorApp",
-        "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+        "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
         "packagesPath": "C:\\Users\\romag\\.nuget\\packages\\",
-        "outputPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
+        "outputPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\romag\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -51,14 +51,6 @@
               "target": "Package",
               "version": "[10.0.5, )",
               "autoReferenced": true
-            },
-            "Microsoft.AspNetCore.Components": {
-              "target": "Package",
-              "version": "[10.0.5, )"
-            },
-            "Microsoft.AspNetCore.Components.Forms": {
-              "target": "Package",
-              "version": "[10.0.5, )"
             }
           },
           "imports": [

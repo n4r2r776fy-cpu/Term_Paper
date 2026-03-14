@@ -1,49 +1,60 @@
 @page "/checkout"
-@inject MyBlazorApp.Services.DataService DataService
+@inject DataService DataService
 
-<PageTitle>Checkout</PageTitle>
+<PageTitle>Оплата</PageTitle>
 
-<h2>Checkout</h2>
+<h2>Оплата записів</h2>
 
 <div class="checkout-list">
-    @foreach (var item in items)
+    @if (items.Count == 0)
     {
         <div class="checkout-card small">
-            <div class="checkout-row">
-                <div>
-                    <div class="c-name">@item.Name</div>
-                    <div class="c-sub">@item.Details</div>
-                </div>
-                <div class="c-right">
-                    <div class="amount">$@item.Amount</div>
-                    <div class="status">@(item.Paid ? "Paid" : "Not Paid")</div>
-                </div>
-            </div>
-            <div class="checkout-actions">
-                <button class="btn primary" @onclick="() => TogglePaid(item)">@((item.Paid) ? "Mark Unpaid" : "Mark Paid")</button>
-            </div>
+            <div class="empty-state">Немає записів для відображення.</div>
         </div>
+    }
+    else
+    {
+        @foreach (var item in items)
+        {
+            <div class="checkout-card small">
+                <div class="checkout-row">
+                    <div>
+                        <div class="c-name">@item.Name</div>
+                        <div class="c-sub">@item.DoctorName · @item.Service</div>
+                    </div>
+                    <div class="c-right">
+                        <div class="amount">@item.Price.ToString("0.##") грн</div>
+                        <div class="status">@(item.Paid ? "Сплачено" : "Не сплачено")</div>
+                    </div>
+                </div>
+                <div class="checkout-actions">
+                    <button class="btn primary" @onclick="() => TogglePaid(item.Id)">@((item.Paid) ? "Позначити як не сплачено" : "Позначити як сплачено")</button>
+                </div>
+            </div>
+        }
     }
 </div>
 
 @code {
-    private List<CheckoutItem> items = new()
-    {
-        new CheckoutItem("Huisan Li", "Consultation + meds", 37.05m, false),
-        new CheckoutItem("Joe White", "Consultation + meds", 34.05m, true),
-    };
+    private List<Appointment> items = new();
 
-    private void TogglePaid(CheckoutItem i) => i.Paid = !i.Paid;
-
-    private class CheckoutItem
+    protected override void OnInitialized()
     {
-        public string Name { get; }
-        public string Details { get; }
-        public decimal Amount { get; }
-        public bool Paid { get; set; }
-        public CheckoutItem(string name, string details, decimal amount, bool paid)
-        {
-            Name = name; Details = details; Amount = amount; Paid = paid;
-        }
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        items = DataService.GetAppointments()
+            .Where(a => a.Status != AppointmentStatuses.Cancelled)
+            .OrderBy(a => a.Paid)
+            .ThenByDescending(a => a.Date)
+            .ToList();
+    }
+
+    private void TogglePaid(int id)
+    {
+        DataService.TogglePaid(id);
+        LoadData();
     }
 }

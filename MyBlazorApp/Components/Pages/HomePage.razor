@@ -1,83 +1,107 @@
+@page "/"
 @page "/homepage"
+@inject DataService DataService
+@inject NavigationManager Navigation
+@inject AuthService AuthService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Головна</PageTitle>
 
 <link href="css/HomePage.css" rel="stylesheet" />
+
+<div class="dashboard-intro">
+    <div>
+        <h1>Керування записами клініки</h1>
+        <p>Нові бронювання, статуси черги та стан оплат одразу відображаються на всіх сторінках сайту.</p>
+    </div>
+    @if (!AuthService.IsLoggedIn)
+    {
+        <div class="demo-credentials">
+            <div><strong>Демо вхід:</strong> demo@clinic.local</div>
+            <div><strong>Пароль:</strong> demo123</div>
+        </div>
+    }
+</div>
 
 <div class="dashboard">
     <div class="dashboard-left">
         <section class="section doctors">
-            <h2>Doctors</h2>
-            <div class="cards-row">
-                <div class="doctor-card">
-                    <div class="doctor-header">
-                        <img src="/lib/icons/avatar1.svg" alt="Erica" />
-                        <div class="doctor-meta">
-                            <div class="name">Erica Lim</div>
-                            <div class="status">Not Serving Patient</div>
-                        </div>
-                    </div>
-                    <div class="patient-box">
-                        <div class="patient-name">Nick Young</div>
-                        <button class="btn action">Start Consultation</button>
-                    </div>
+            <div class="section-header-row">
+                <div>
+                    <h2>Лікарі</h2>
+                    <div class="section-subtitle">Реальні записи по лікарях</div>
                 </div>
-
-                <div class="doctor-card">
-                    <div class="doctor-header">
-                        <img src="/lib/icons/avatar2.svg" alt="Kevin" />
-                        <div class="doctor-meta">
-                            <div class="name">Kevin Zane</div>
-                            <div class="status">Serving patient</div>
-                        </div>
-                    </div>
-                    <div class="patient-box">
-                        <div class="patient-name">Alina Choo</div>
-                        <button class="btn success">Complete Consultation</button>
-                    </div>
-                </div>
+                <button class="btn action" @onclick='() => Navigation.NavigateTo("/doctors")'>Усі лікарі</button>
             </div>
-            <a class="show-more" href="#">Show More Doctors</a>
+
+            <div class="cards-row wrap-cards">
+                @foreach (var doctor in doctors)
+                {
+                    var nextAppointment = GetNextAppointmentForDoctor(doctor.Name);
+                    <div class="doctor-card">
+                        <div class="doctor-header">
+                            <img src="@doctor.AvatarPath" alt="@doctor.Name" />
+                            <div class="doctor-meta">
+                                <div class="name">@doctor.Name</div>
+                                <div class="doctor-specialty">@doctor.Specialty</div>
+                                <div class="status">@(nextAppointment is null ? "Вільний" : $"Наступний прийом о {nextAppointment.Time}")</div>
+                            </div>
+                        </div>
+                        <div class="patient-box">
+                            @if (nextAppointment is null)
+                            {
+                                <div class="patient-name">Немає активних записів</div>
+                            }
+                            else
+                            {
+                                <div class="patient-name">@nextAppointment.Name</div>
+                                <div class="patient-details">@nextAppointment.Service · @nextAppointment.Date.ToString("dd.MM.yyyy")</div>
+                            }
+                            <button class="btn action" @onclick='() => OpenBooking(doctor.Name)'>Записатися</button>
+                        </div>
+                    </div>
+                }
+            </div>
         </section>
 
         <section class="section queue">
-            <h2>Queue</h2>
+            <div class="section-header-row">
+                <div>
+                    <h2>Черга</h2>
+                    <div class="section-subtitle">Найближчі прийоми</div>
+                </div>
+                <button class="btn primary" @onclick='() => Navigation.NavigateTo("/queue")'>Відкрити чергу</button>
+            </div>
+
             <div class="queue-box">
                 <div class="queue-tabs">
-                    <button class="tab active">Upcoming <span class="badge">3</span></button>
-                    <button class="tab">Missed <span class="badge">12</span></button>
-                </div>
-                <div class="queue-search">
-                    <input placeholder="Search" />
+                    <button class="tab active">Upcoming <span class="badge">@upcomingAppointments.Count</span></button>
+                    <button class="tab">Missed <span class="badge">@missedAppointments.Count</span></button>
                 </div>
 
-                <div class="queue-cards">
-                    <div class="queue-card">
-                        <div class="q-left">
-                            <div class="avatar small">M</div>
-                            <div class="q-meta">
-                                <div class="q-name">Nick Young</div>
-                                <div class="q-sub">S9227486T — Confirmed</div>
+                <div class="queue-cards column-list">
+                    @if (upcomingAppointments.Count == 0)
+                    {
+                        <div class="empty-state">Поки що немає активних записів.</div>
+                    }
+                    else
+                    {
+                        @foreach (var item in upcomingAppointments.Take(4).Select((appointment, index) => new { appointment, index }))
+                        {
+                            <div class="queue-card">
+                                <div class="q-left">
+                                    <div class="avatar small">@item.appointment.Name[..1]</div>
+                                    <div class="q-meta">
+                                        <div class="q-name">@item.appointment.Name</div>
+                                        <div class="q-sub">@item.appointment.DoctorName · @item.appointment.Date.ToString("dd.MM") · @item.appointment.Time</div>
+                                    </div>
+                                </div>
+                                <div class="q-right compact-right">
+                                    <div class="q-number">#@(item.index + 1)</div>
+                                    <button class="btn danger" @onclick='() => RemoveAppointment(item.appointment.Id)'>Скасувати</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="q-right">
-                            <div class="q-number">48</div>
-                            <button class="btn danger">Cancel Queue</button>
-                        </div>
-                    </div>
-                    <div class="queue-card">
-                        <div class="q-left">
-                            <div class="avatar small">I</div>
-                            <div class="q-meta">
-                                <div class="q-name">Muhammad Imran</div>
-                                <div class="q-sub">T0013984R — Not Confirmed</div>
-                            </div>
-                        </div>
-                        <div class="q-right">
-                            <div class="q-number">49</div>
-                            <button class="btn danger">Cancel Queue</button>
-                        </div>
-                    </div>
+                        }
+                    }
                 </div>
             </div>
         </section>
@@ -85,31 +109,92 @@
 
     <aside class="dashboard-right">
         <section class="section checkout">
-            <h2>Checkout</h2>
-            <div class="checkout-card">
-                <div class="checkout-item">
-                    <div class="c-avatar">H</div>
-                    <div class="c-meta">
-                        <div class="c-name">Huisan Li</div>
-                        <div class="c-info">$37.05 — Not Paid</div>
-                    </div>
+            <div class="section-header-row">
+                <div>
+                    <h2>Оплата</h2>
+                    <div class="section-subtitle">Останні рахунки</div>
                 </div>
-                <button class="btn primary">Details</button>
             </div>
 
-            <div class="checkout-card">
-                <div class="checkout-item">
-                    <div class="c-avatar">J</div>
-                    <div class="c-meta">
-                        <div class="c-name">Joe White</div>
-                        <div class="c-info">$34.05 — Paid</div>
-                    </div>
+            @if (checkoutAppointments.Count == 0)
+            {
+                <div class="checkout-card">
+                    <div class="empty-state">Немає записів для оплати.</div>
                 </div>
-                <button class="btn primary">Details</button>
-            </div>
+            }
+            else
+            {
+                @foreach (var appointment in checkoutAppointments)
+                {
+                    <div class="checkout-card">
+                        <div class="checkout-item">
+                            <div class="c-avatar">@appointment.Name[..1]</div>
+                            <div class="c-meta">
+                                <div class="c-name">@appointment.Name</div>
+                                <div class="c-info">@appointment.Service · @appointment.Price.ToString("0.##") грн</div>
+                            </div>
+                        </div>
+                        <button class="btn primary" @onclick='() => TogglePaid(appointment.Id)'>@(appointment.Paid ? "Позначити як не сплачено" : "Позначити як сплачено")</button>
+                    </div>
+                }
+            }
         </section>
     </aside>
 </div>
 
 @code {
+    private IReadOnlyList<Doctor> doctors = Array.Empty<Doctor>();
+    private List<Appointment> upcomingAppointments = new();
+    private List<Appointment> missedAppointments = new();
+    private List<Appointment> checkoutAppointments = new();
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        var appointments = DataService.GetAppointments();
+        doctors = DataService.GetDoctors();
+        upcomingAppointments = appointments
+            .Where(a => a.Status != AppointmentStatuses.Cancelled && a.Date.Date >= DateTime.Today)
+            .ToList();
+        missedAppointments = appointments
+            .Where(a => a.Status == AppointmentStatuses.Missed || a.Date.Date < DateTime.Today)
+            .ToList();
+        checkoutAppointments = appointments
+            .Where(a => a.Status != AppointmentStatuses.Cancelled)
+            .OrderBy(a => a.Paid)
+            .ThenByDescending(a => a.CreatedAt)
+            .Take(3)
+            .ToList();
+    }
+
+    private Appointment? GetNextAppointmentForDoctor(string doctorName) => upcomingAppointments
+        .FirstOrDefault(a => string.Equals(a.DoctorName, doctorName, StringComparison.OrdinalIgnoreCase));
+
+    private void OpenBooking(string doctorName)
+    {
+        if (!AuthService.IsLoggedIn)
+        {
+            var returnUrl = Uri.EscapeDataString($"/booking?doctor={Uri.EscapeDataString(doctorName)}");
+            Navigation.NavigateTo($"/login?returnUrl={returnUrl}");
+            return;
+        }
+
+        Navigation.NavigateTo($"/booking?doctor={Uri.EscapeDataString(doctorName)}");
+    }
+
+    private void RemoveAppointment(int id)
+    {
+        DataService.DeleteAppointment(id);
+        LoadData();
+    }
+
+    private void TogglePaid(int id)
+    {
+        DataService.TogglePaid(id);
+        LoadData();
+    }
 }

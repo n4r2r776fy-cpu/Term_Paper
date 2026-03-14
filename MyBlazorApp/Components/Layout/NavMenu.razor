@@ -19,6 +19,12 @@
             </a>
         </li>
         <li>
+            <a href="/appointments">
+                <img src="/lib/icons/queue-icon.svg" alt="Appointments" />
+                Записи
+            </a>
+        </li>
+        <li>
             <a href="/checkout">
                 <img src="/lib/icons/checkout-icon.svg" alt="Checkout" />
                 Чек-аут
@@ -31,6 +37,11 @@
             </a>
         </li>
     </ul>
+
+    @if (AuthService.IsLoggedIn)
+    {
+        <button class="btn btn-link mt-3" @onclick="Logout">Вийти</button>
+    }
 </nav>
 
 @code {

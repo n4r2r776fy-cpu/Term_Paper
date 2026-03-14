@@ -1,11 +1,8 @@
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components
-@using MyBlazorApp.Models
 @page "/register"
-@inject MyBlazorApp.Services.DataService DataService
-@inject MyBlazorApp.Services.AuthService AuthService
+@using MyBlazorApp.Models
+@using MyBlazorApp.Services
+@inject AuthService AuthService
 @inject NavigationManager Navigation
-@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Реєстрація</PageTitle>
 
@@ -30,50 +27,27 @@
         <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
     </div>
 
-    <div class="form-group">
-        <label for="confirm">Підтвердити пароль:</label>
-        <InputText id="confirm" @bind-Value="confirmPassword" class="form-control" type="password" />
-    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
 
-    <button type="submit" class="btn btn-primary">Зареєструватися</button>
+    <button type="submit" class="btn btn-primary mt-3">Зареєструватися</button>
 </EditForm>
-
-<p>Вже маєте акаунт? <a href="/login">Увійти</a></p>
 
 @code {
     private User user = new();
-    private string confirmPassword = string.Empty;
-
-    private string? returnUrl;
-
-    protected override void OnInitialized()
-    {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var ru))
-        {
-            returnUrl = ru;
-        }
-    }
+    private string? errorMessage;
 
     private void HandleRegister()
     {
-        if (user.Password != confirmPassword) return;
-
-        if (DataService.RegisterUser(user))
+        errorMessage = null;
+        if (AuthService.Register(user))
         {
-            AuthService.Login(user);
-            if (!string.IsNullOrEmpty(returnUrl))
-            {
-                Navigation.NavigateTo(Uri.UnescapeDataString(returnUrl!));
-            }
-            else
-            {
-                Navigation.NavigateTo("/homepage");
-            }
+            // Автоматично входимо в систему після реєстрації
+            if (AuthService.Login(user.Email, user.Password)) Navigation.NavigateTo("/homepage");
+            else errorMessage = "Не вдалося увійти після реєстрації.";
         }
-        else
-        {
-            // user exists - feedback could be added
-        }
+        else errorMessage = "Користувач з таким email вже існує.";
     }
 }

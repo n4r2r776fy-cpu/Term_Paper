@@ -11,41 +11,6 @@
         "buildMultiTargeting": {
           "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets": {}
         }
-      },
-      "Microsoft.AspNetCore.Components/10.0.5": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.AspNetCore.Components.Analyzers": "10.0.5"
-        },
-        "compile": {
-          "lib/net10.0/_._": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/_._": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.AspNetCore.Components.Analyzers/10.0.5": {
-        "type": "package",
-        "build": {
-          "buildTransitive/netstandard2.0/_._": {}
-        }
-      },
-      "Microsoft.AspNetCore.Components.Forms/10.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/net10.0/_._": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/_._": {
-            "related": ".xml"
-          }
-        }
       }
     }
   },
@@ -72,59 +37,11 @@
         "microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
       ]
-    },
-    "Microsoft.AspNetCore.Components/10.0.5": {
-      "sha512": "zQOaFWn6qGEnPPrhnZyXFjj2tKqxzFlPDTd1Ay8Hq6NKXbNVMH450sSHc5y4Al2XR0/kjNzZgkzTDpl+d7P8nw==",
-      "type": "package",
-      "path": "microsoft.aspnetcore.components/10.0.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "THIRD-PARTY-NOTICES.txt",
-        "lib/net10.0/Microsoft.AspNetCore.Components.dll",
-        "lib/net10.0/Microsoft.AspNetCore.Components.xml",
-        "microsoft.aspnetcore.components.10.0.5.nupkg.sha512",
-        "microsoft.aspnetcore.components.nuspec"
-      ]
-    },
-    "Microsoft.AspNetCore.Components.Analyzers/10.0.5": {
-      "sha512": "HbOtAp1Bt0RFmGme22XdrnnXCSv7GW4WhnTHunyoZ7Zj4Y5zd1kNQTODsX7mVYrfrD5v0Zw+FnM8Ka2E9w1CoA==",
-      "type": "package",
-      "path": "microsoft.aspnetcore.components.analyzers/10.0.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "THIRD-PARTY-NOTICES.txt",
-        "analyzers/dotnet/cs/Microsoft.AspNetCore.Components.Analyzers.dll",
-        "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
-        "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
-        "microsoft.aspnetcore.components.analyzers.10.0.5.nupkg.sha512",
-        "microsoft.aspnetcore.components.analyzers.nuspec"
-      ]
-    },
-    "Microsoft.AspNetCore.Components.Forms/10.0.5": {
-      "sha512": "bk9RzweI3LjyfBfCdYOGg5kzSLbMh4oggQ53GtRE9kVKfnwciu4wr6M8cfOaJg30Nr/SGknmnMkl6e1ZEodV0w==",
-      "type": "package",
-      "path": "microsoft.aspnetcore.components.forms/10.0.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "THIRD-PARTY-NOTICES.txt",
-        "lib/net10.0/Microsoft.AspNetCore.Components.Forms.dll",
-        "lib/net10.0/Microsoft.AspNetCore.Components.Forms.xml",
-        "microsoft.aspnetcore.components.forms.10.0.5.nupkg.sha512",
-        "microsoft.aspnetcore.components.forms.nuspec"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.5",
-      "Microsoft.AspNetCore.Components >= 10.0.5",
-      "Microsoft.AspNetCore.Components.Forms >= 10.0.5"
+      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.5"
     ]
   },
   "packageFolders": {
@@ -133,11 +50,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+      "projectUniqueName": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
       "projectName": "MyBlazorApp",
-      "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+      "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
       "packagesPath": "C:\\Users\\romag\\.nuget\\packages\\",
-      "outputPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
+      "outputPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\romag\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -177,14 +94,6 @@
             "target": "Package",
             "version": "[10.0.5, )",
             "autoReferenced": true
-          },
-          "Microsoft.AspNetCore.Components": {
-            "target": "Package",
-            "version": "[10.0.5, )"
-          },
-          "Microsoft.AspNetCore.Components.Forms": {
-            "target": "Package",
-            "version": "[10.0.5, )"
           }
         },
         "imports": [
@@ -623,27 +532,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "PackageReference Microsoft.AspNetCore.Components will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "libraryId": "Microsoft.AspNetCore.Components",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "PackageReference Microsoft.AspNetCore.Components.Forms will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "libraryId": "Microsoft.AspNetCore.Components.Forms",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  }
 }

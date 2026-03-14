@@ -1,38 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "LfJpahmyV7s=",
+  "dgSpecHash": "BWDb8sNkhF4=",
   "success": true,
-  "projectFilePath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+  "projectFilePath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.5\\microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512",
-    "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.components\\10.0.5\\microsoft.aspnetcore.components.10.0.5.nupkg.sha512",
-    "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\10.0.5\\microsoft.aspnetcore.components.analyzers.10.0.5.nupkg.sha512",
-    "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.components.forms\\10.0.5\\microsoft.aspnetcore.components.forms.10.0.5.nupkg.sha512"
+    "C:\\Users\\romag\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.5\\microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.AspNetCore.Components will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
-      "libraryId": "Microsoft.AspNetCore.Components",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.AspNetCore.Components.Forms will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
-      "libraryId": "Microsoft.AspNetCore.Components.Forms",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

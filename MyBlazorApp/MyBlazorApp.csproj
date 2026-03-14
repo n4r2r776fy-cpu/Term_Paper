@@ -7,9 +7,8 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="10.0.5" />
-  </ItemGroup>
+  <Target Name="StopRunningMyBlazorApp" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;$processes = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq 'MyBlazorApp.exe' -or ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -like '*MyBlazorApp.dll*') }); foreach ($process in $processes) { Stop-Process -Id $process.ProcessId -Force -ErrorAction SilentlyContinue }; foreach ($process in $processes) { Wait-Process -Id $process.ProcessId -Timeout 15 -ErrorAction SilentlyContinue }; exit 0&quot;" />
+  </Target>
 
 </Project>

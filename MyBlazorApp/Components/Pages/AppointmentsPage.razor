@@ -1,10 +1,16 @@
 @page "/appointments"
 @inject DataService DataService
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Список записів</PageTitle>
 
 <h1>Список записів</h1>
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="alert @(isSuccessMessage ? "alert-success" : "alert-info")">@statusMessage</div>
+}
 
 @if (Appointments.Count == 0)
 {
@@ -44,7 +50,9 @@ else
                         {
                             <button class="btn btn-success me-2" @onclick="() => UpdateStatus(appointment.Id, AppointmentStatuses.Completed)">Завершити</button>
                         }
-                        <button class="btn btn-secondary me-2" @onclick="() => TogglePaid(appointment.Id)">Оплата</button>
+                        <button class="btn btn-secondary me-2" @onclick="() => TogglePaid(appointment.Id)">
+                            @(appointment.Paid ? "Скасувати оплату" : "Оплатити")
+                        </button>
                         <button class="btn btn-danger" @onclick="() => DeleteAppointment(appointment.Id)">Видалити</button>
                     </td>
                 </tr>
@@ -57,9 +65,19 @@ else
 
 @code {
     private List<Appointment> Appointments = new();
+    private string? statusMessage;
+    private bool isSuccessMessage;
 
     protected override void OnInitialized()
     {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("message", out var message)
+            && string.Equals(message.ToString(), "created", StringComparison.OrdinalIgnoreCase))
+        {
+            statusMessage = "Запис успішно створено. Тепер його можна завершити, оплатити або видалити.";
+            isSuccessMessage = true;
+        }
+
         LoadAppointments();
     }
 
@@ -72,12 +90,22 @@ else
     {
         DataService.UpdateAppointmentStatus(id, status);
         LoadAppointments();
+        statusMessage = "Прийом позначено як завершений.";
+        isSuccessMessage = true;
     }
 
     private void TogglePaid(int id)
     {
+        var appointment = Appointments.FirstOrDefault(item => item.Id == id);
         DataService.TogglePaid(id);
         LoadAppointments();
+        if (appointment is not null)
+        {
+            statusMessage = appointment.Paid
+                ? "Оплату скасовано. Запис знову позначено як не сплачений."
+                : "Оплату підтверджено успішно.";
+            isSuccessMessage = true;
+        }
     }
 
     private static string GetStatusText(string status) => status switch
@@ -92,5 +120,7 @@ else
     {
         DataService.DeleteAppointment(id);
         LoadAppointments();
+        statusMessage = "Запис видалено.";
+        isSuccessMessage = true;
     }
 }

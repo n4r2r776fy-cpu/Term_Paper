@@ -48,9 +48,9 @@
     [Inject] private AuthService AuthService { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
-    private void Logout()
+    private async Task Logout()
     {
-        AuthService.Logout();
+        await AuthService.LogoutAsync();
         Navigation.NavigateTo("/homepage");
     }
 }

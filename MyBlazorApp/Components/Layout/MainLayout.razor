@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 @inject MyBlazorApp.Services.AuthService AuthService
 @inject NavigationManager Navigation
 
@@ -20,7 +21,13 @@
                     <img src="/lib/icons/settings-icon.svg" alt="Settings" />
                 </div>
 
-                @if (!AuthService.IsLoggedIn)
+                @if (!AuthService.IsInitialized)
+                {
+                    <div class="auth-buttons">
+                        <span>Завантаження...</span>
+                    </div>
+                }
+                else if (!AuthService.IsLoggedIn)
                 {
                     <div class="auth-buttons">
                         <a class="btn btn-outline" href="/login">Вхід</a>
@@ -44,10 +51,33 @@
 </div>
 
 @code {
-    private void Logout()
+    protected override void OnInitialized()
     {
-        AuthService.Logout();
+        AuthService.OnChange += HandleAuthChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AuthService.InitializeAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= HandleAuthChanged;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
         Navigation.NavigateTo("/homepage");
+    }
+
+    private void HandleAuthChanged()
+    {
+        InvokeAsync(StateHasChanged);
     }
 }
 

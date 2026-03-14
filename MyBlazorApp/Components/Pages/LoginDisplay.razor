@@ -21,9 +21,9 @@
 
     public void Dispose() => AuthService.OnChange -= StateHasChanged;
 
-    private void Logout()
+    private async Task Logout()
     {
-        AuthService.Logout();
+        await AuthService.LogoutAsync();
         Navigation.NavigateTo("/");
     }
 }

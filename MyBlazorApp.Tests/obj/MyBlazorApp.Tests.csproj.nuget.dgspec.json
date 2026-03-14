@@ -28,8 +28,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
-                "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj"
+              "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
+                "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj"
               }
             }
           }
@@ -363,14 +363,14 @@
         }
       }
     },
-    "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
+    "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+        "projectUniqueName": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
         "projectName": "MyBlazorApp",
-        "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
+        "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj",
         "packagesPath": "C:\\Users\\romag\\.nuget\\packages\\",
-        "outputPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
+        "outputPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\romag\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -7,7 +7,11 @@
 
 <h2>Settings</h2>
 
-@if (!AuthService.IsLoggedIn)
+@if (!AuthService.IsInitialized)
+{
+    <p>Loading profile...</p>
+}
+else if (!AuthService.IsLoggedIn)
 {
     <p>You are not logged in.</p>
     <a href="/login">Login</a>
@@ -24,9 +28,9 @@ else
 }
 
 @code {
-    private void Logout()
+    private async Task Logout()
     {
-        AuthService.Logout();
+        await AuthService.LogoutAsync();
         Navigation.NavigateTo("/homepage");
     }
 }

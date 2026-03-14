@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.WebUtilities
 @using MyBlazorApp.Models
+@implements IDisposable
 @page "/booking"
 @inject DataService DataService
 @inject AuthService AuthService
@@ -9,7 +10,11 @@
 
 <PageTitle>Запис на прийом</PageTitle>
 
-@if (!AuthService.IsLoggedIn)
+@if (!AuthService.IsInitialized)
+{
+    <p>Завантаження профілю...</p>
+}
+else if (!AuthService.IsLoggedIn)
 {
     <p>Будь ласка, <a href="/login">увійдіть</a> або <a href="/register">зареєструйтесь</a>, щоб записатися на прийом.</p>
 }
@@ -79,6 +84,7 @@ else
 
     protected override void OnInitialized()
     {
+        AuthService.OnChange += HandleAuthChanged;
         doctors = DataService.GetDoctors();
 
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
@@ -87,11 +93,27 @@ else
             appointment.DoctorName = doctor.ToString();
         }
 
+        PopulateUserData();
+    }
+
+    private void PopulateUserData()
+    {
         if (AuthService.IsLoggedIn)
         {
             appointment.Name = AuthService.CurrentUser!.Name;
             appointment.Email = AuthService.CurrentUser.Email;
         }
+    }
+
+    private void HandleAuthChanged()
+    {
+        PopulateUserData();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= HandleAuthChanged;
     }
 
     private void HandleValidSubmit()
@@ -104,6 +126,6 @@ else
         appointment.UserEmail = AuthService.CurrentUser!.Email;
         appointment.Status = AppointmentStatuses.Upcoming;
         DataService.SaveAppointment(appointment);
-        Navigation.NavigateTo("/appointments");
+        Navigation.NavigateTo("/appointments?message=created");
     }
 }

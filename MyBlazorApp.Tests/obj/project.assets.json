@@ -975,8 +975,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
-              "projectPath": "D:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj"
+            "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj": {
+              "projectPath": "d:\\Курсова Робота\\Term_Paper\\MyBlazorApp\\MyBlazorApp.csproj"
             }
           }
         }

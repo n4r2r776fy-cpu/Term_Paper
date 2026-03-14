@@ -1,5 +1,6 @@
 using MyBlazorApp.Components;
 using MyBlazorApp.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Net;
 using System.Net.Sockets;
 
@@ -12,6 +13,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<DataService>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<IAuthStateStore, BrowserAuthStateStore>();
 builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();

@@ -8,46 +8,61 @@
 
 <h1>Реєстрація</h1>
 
-<EditForm Model="@user" OnValidSubmit="HandleRegister">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if (!AuthService.IsInitialized)
+{
+    <p>Завантаження стану авторизації...</p>
+}
+else
+{
+    <EditForm Model="@user" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="form-group">
-        <label for="name">Ім'я:</label>
-        <InputText id="name" @bind-Value="user.Name" class="form-control" />
-    </div>
+        <div class="form-group">
+            <label for="name">Ім'я:</label>
+            <InputText id="name" @bind-Value="user.Name" class="form-control" />
+        </div>
 
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="user.Email" class="form-control" />
-    </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <InputText id="email" @bind-Value="user.Email" class="form-control" />
+        </div>
 
-    <div class="form-group">
-        <label for="password">Пароль:</label>
-        <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
-    </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
+        </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger mt-2">@errorMessage</div>
-    }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-2">@errorMessage</div>
+        }
 
-    <button type="submit" class="btn btn-primary mt-3">Зареєструватися</button>
-</EditForm>
+        <button type="submit" class="btn btn-primary mt-3">Зареєструватися</button>
+    </EditForm>
+}
 
 @code {
     private User user = new();
     private string? errorMessage;
 
-    private void HandleRegister()
+    private async Task HandleRegister()
     {
         errorMessage = null;
-        if (AuthService.Register(user))
+        if (await AuthService.RegisterAsync(user))
         {
-            // Автоматично входимо в систему після реєстрації
-            if (AuthService.Login(user.Email, user.Password)) Navigation.NavigateTo("/homepage");
-            else errorMessage = "Не вдалося увійти після реєстрації.";
+            if (await AuthService.LoginAsync(user.Email, user.Password))
+            {
+                Navigation.NavigateTo("/homepage");
+            }
+            else
+            {
+                errorMessage = "Не вдалося увійти після реєстрації.";
+            }
         }
-        else errorMessage = "Користувач з таким email вже існує.";
+        else
+        {
+            errorMessage = "Користувач з таким email вже існує.";
+        }
     }
 }

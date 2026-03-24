@@ -1,17 +1,41 @@
-using AppointmentSystem.Models;
 using AppointmentSystem.Data;
-using AppointmentSystem.Components;
+using AppointmentSystem.Services; // Для нашого сервісу
+using AppointmentSystem.Models;   // Для класу Doctor
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Додаємо сервіси до контейнера
 builder.Services.AddRazorComponents()
-.AddInteractiveServerComponents().AddInteractiveServerComponents();
+    .AddInteractiveServerComponents();
+
+// 2. Налаштування бази даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=appointments.db"));
 
+// 3. Реєстрація нашого сервісу логіки (Dependency Injection)
+builder.Services.AddScoped<BookingService>();
+
 var app = builder.Build();
 
+// --- БЛОК АВТОЗАПОВНЕННЯ (SEED DATA) ---
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.EnsureCreated();
+
+    if (!db.Doctors.Any())
+    {
+        db.Doctors.AddRange(
+            new Doctor { Name = "Олександр Майстер", Specialization = "Тату" },
+            new Doctor { Name = "Марія Стильна", Specialization = "Косметолог" },
+            new Doctor { Name = "Іван Борода", Specialization = "Барбер" }
+        );
+        db.SaveChanges();
+    }
+}
+
+// Конфігурація HTTP-запитів
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -19,22 +43,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAntiforgery();
-app.MapStaticAssets();
-app.MapRazorComponents<AppointmentSystem.Components.App>()
-.AddInteractiveServerRenderMode();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (!db.Doctors.Any()) // Якщо в базі ще немає жодного майстра
-    {
-        db.Doctors.AddRange(
-            new Doctor { Name = "Олександр", Specialization = "Стрижки та бороди" },
-            new Doctor { Name = "Марія", Specialization = "Манікюр" },
-            new Doctor { Name = "Дмитро", Specialization = "Тату-майстер" }
-        );
-        db.SaveChanges();
-    }
-}
+app.MapRazorComponents<AppointmentSystem.Components.App>()
+    .AddInteractiveServerRenderMode();
+
 app.Run();

@@ -1,7 +1,9 @@
 @page "/booking"
 @using AppointmentSystem.Data
 @using AppointmentSystem.Models
+@using AppointmentSystem.Services  
 @inject ApplicationDbContext Db
+@inject BookingService BookingSvc
 @rendermode InteractiveServer
 
 <div class="container py-4">
@@ -151,53 +153,33 @@
         }
     }
 
-    private void Save()
+private void Save()
+{
+    errorMessage = "";
+
+    // Використовуємо наш сервіс для перевірки
+    string result = BookingSvc.ValidateBooking(selectedDoctorId, appointmentTime);
+
+    if (result != "OK")
     {
-        errorMessage = ""; 
-
-        if (selectedDoctorId == 0 || string.IsNullOrEmpty(patientName))
-        {
-            errorMessage = "Будь ласка, заповніть усі дані.";
-            return;
-        }
-
-        // 1. Блокуємо неробочі години (9 - 19)
-        if (appointmentTime.Hour < 9 || appointmentTime.Hour >= 19)
-        {
-            errorMessage = "На жаль, у цей час студія зачинена (09:00 - 19:00).";
-            return;
-        }
-
-        if (appointmentTime < DateTime.Now)
-        {
-            errorMessage = "Неможливо здійснити запис на минулий час.";
-            return;
-        }
-
-        // 2. Перевірка на конфлікт часу
-        bool isBusy = Db.Appointments.Any(a => 
-            a.DoctorId == selectedDoctorId && 
-            a.AppointmentDate == appointmentTime);
-
-        if (isBusy)
-        {
-            errorMessage = "Цей часовий слот уже заброньовано. Оберіть інший.";
-            return;
-        }
-
-        lastAppointment = new Appointment 
-        { 
-            DoctorId = selectedDoctorId, 
-            AppointmentDate = appointmentTime, 
-            PatientName = patientName 
-        };
-        
-        Db.Appointments.Add(lastAppointment);
-        Db.SaveChanges();
-        
-        showTicket = true;
-        patientName = ""; 
+        errorMessage = result;
+        return;
     }
+
+    // Якщо все пройшло — зберігаємо
+    lastAppointment = new Appointment 
+    { 
+        DoctorId = selectedDoctorId, 
+        AppointmentDate = appointmentTime, 
+        PatientName = patientName 
+    };
+    
+    Db.Appointments.Add(lastAppointment);
+    Db.SaveChanges();
+    
+    showTicket = true;
+    patientName = ""; 
+}
 
     private void Delete(int id)
     {

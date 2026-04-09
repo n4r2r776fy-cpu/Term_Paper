@@ -1,23 +1,39 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <NavMenu />
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+        <article class="content">
             @Body
         </article>
     </main>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
+<div id="blazor-error-ui">
     An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
 </div>
+
+<style>
+    /* ПОВНЕ ОБНУЛЕННЯ СТАНДАРТНИХ ВІДСТУПІВ */
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #000; /* Зафарбовуємо все чорним */
+        min-height: 100vh;
+    }
+
+    .content {
+        padding: 0 !important; /* Прибираємо білі відступи */
+    }
+
+    /* Прибираємо старий Sidebar, якщо він прописаний у CSS */
+    .sidebar { display: none !important; }
+    
+    .page {
+        display: block !important; /* Вимикаємо flex-row, щоб меню було зверху */
+    }
+</style>

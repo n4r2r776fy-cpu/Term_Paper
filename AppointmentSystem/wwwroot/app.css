@@ -46,3 +46,69 @@ body {
     background-color: #f1c40f !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
+/* --- НОВІ СТИЛІ ДЛЯ СИСТЕМИ ЗАПИСУ ТА МАЙСТРІВ --- */
+
+/* Контейнер картки запису */
+.booking-card {
+    max-width: 550px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    margin: 50px auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* Кастомні поля вводу (щоб не були білими як на скрині) */
+.ios-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 15px !important;
+    padding: 12px 15px !important;
+    color: white !important;
+    margin-top: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.ios-input:focus {
+    border-color: #d4af37 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+/* Велика золота кнопка */
+.ios-btn-large {
+    background: #d4af37 !important;
+    color: #000 !important;
+    border: none !important;
+    padding: 16px !important;
+    border-radius: 18px !important;
+    font-weight: 800 !important;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    width: 100%;
+    margin-top: 20px;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ios-btn-large:hover:not(:disabled) {
+    transform: scale(1.03);
+    background: #f1c40f !important;
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4);
+}
+
+.ios-btn-large:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Стилізація випадаючого списку (щоб текст був білим) */
+select.ios-input option {
+    background: #1a1a1a;
+    color: white;
+}

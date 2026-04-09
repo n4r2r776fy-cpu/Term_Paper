@@ -1,194 +1,295 @@
 @page "/booking"
-@using AppointmentSystem.Data
 @using AppointmentSystem.Models
-@using AppointmentSystem.Services  
-@inject ApplicationDbContext Db
-@inject BookingService BookingSvc
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<AppointmentSystem.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-5 mb-4">
-            <div class="card shadow border-gold bg-dark text-white">
-                <div class="card-header border-gold text-center py-3">
-                    <h4 class="mb-0 gold-text">Оформлення візиту</h4>
+<div class="booking-wrapper">
+    <div class="booking-card pop-in">
+        
+        @if (isBooked)
+        {
+            <div class="text-center success-screen pop-in">
+                <div class="success-icon mb-3">✓</div>
+                <h3 class="gold-text mb-4" style="letter-spacing: 2px;">ЧЕКАЄМО НА ВАС!</h3>
+                
+                <div class="receipt-box text-start p-4 mb-4">
+                    <p class="text-secondary mb-1 small-label">МАЙСТЕР:</p>
+                    <h5 class="text-white mb-3">@bookedDoctorName</h5>
+                    
+                    <p class="text-secondary mb-1 small-label">ДАТА ТА ЧАС:</p>
+                    <h5 class="text-white mb-3" style="color: #d4af37 !important;">@newAppointment.DateTime.ToString("dd.MM.yyyy о HH:mm")</h5>
+                    
+                    <p class="text-secondary mb-1 small-label">КОНТАКТИ СТУДІЇ:</p>
+                    <h5 class="text-white mb-0">+380 (99) 123-45-67</h5>
                 </div>
-                <div class="card-body">
-                    @if (showTicket && lastAppointment != null)
-                    {
-                        <div class="alert alert-dark shadow-sm mb-4 border-gold animated-fade-in" style="border-style: dashed !important;">
-                            <h5 class="alert-heading text-center gold-text">✅ ЗАПИСАНО</h5>
-                            <hr style="background-color: #d4af37;">
-                            <div class="small">
-                                <p><strong>Клієнт:</strong> @lastAppointment.PatientName</p>
-                                <p><strong>Майстер:</strong> @(Db.Doctors.Find(lastAppointment.DoctorId)?.Name)</p>
-                                <p><strong>Час:</strong> @lastAppointment.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</p>
-                            </div>
-                            <hr style="background-color: #d4af37;">
-                            <button class="btn btn-sm btn-outline-gold w-100" @onclick="() => showTicket = false">Новий запис</button>
-                        </div>
-                    }
+                
+                <p class="text-secondary small mb-4">Збережіть цей час або зробіть скріншот.</p>
+                <button class="ios-btn-large" @onclick="GoHome">ПОВЕРНУТИСЯ НА ГОЛОВНУ</button>
+            </div>
+        }
+        else
+        {
+            <h2 class="gold-text text-center mb-4" style="font-weight: 300; letter-spacing: 2px;">RESERVE YOUR TIME</h2>
+            
+            <EditForm Model="@newAppointment" OnValidSubmit="HandleBooking">
+                <DataAnnotationsValidator />
 
-                    <div class="mb-3">
-                        <label class="form-label gold-text">Вибір майстра:</label>
-                        <select class="form-control bg-black text-white border-secondary" @bind="selectedDoctorId">
-                            <option value="0">-- Оберіть фахівця --</option>
-                            @foreach (var doctor in Db.Doctors.ToList())
+                <div class="mb-3 animate-item" style="animation-delay: 0.1s;">
+                    <label class="form-label text-secondary small-label">ВАШЕ ІМ'Я</label>
+                    <InputText @bind-Value="newAppointment.ClientName" class="ios-input" placeholder="Олександр" required />
+                </div>
+
+                <div class="mb-3 animate-item" style="animation-delay: 0.2s;">
+                    <label class="form-label text-secondary small-label">ТЕЛЕФОН</label>
+                    <input type="tel" @bind="newAppointment.ClientPhone" class="ios-input" 
+                           placeholder="+380 99 123 45 67" required 
+                           pattern="[\+]?[0-9\s\-\(\)]+" 
+                           title="Номер має містити тільки цифри та знаки + - ()" />
+                </div>
+
+                <div class="mb-3 animate-item" style="animation-delay: 0.3s;">
+                    <label class="form-label text-secondary small-label">ОБЕРІТЬ МАЙСТРА</label>
+                    <InputSelect @bind-Value="newAppointment.DoctorId" class="ios-input" required>
+                        <option value="0">Оберіть майстра...</option>
+                        @if (doctors != null)
+                        {
+                            @foreach (var doc in doctors)
                             {
-                                <option value="@doctor.Id">@doctor.Name (@doctor.Specialization)</option>
+                                <option value="@doc.Id">@doc.Name (@doc.Specialization)</option>
                             }
-                        </select>
-                    </div>
+                        }
+                    </InputSelect>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label gold-text">Ім'я клієнта:</label>
-                        <input type="text" class="form-control bg-black text-white border-secondary" @bind="patientName" placeholder="Ваше ім'я" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label gold-text">Дата та час:</label>
-                        <input type="datetime-local" class="form-control bg-black text-white border-secondary" 
-                               value="@appointmentTime.ToString("yyyy-MM-ddTHH:mm")" 
-                               @onchange="OnTimeChanged"
-                               step="1800"
-                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                        <div class="form-text text-secondary small mt-1 italic">
-                            Доступні сеанси: 09:00 – 19:00 (кожні 30 хв)
-                        </div>
-                    </div>
-
+                <div class="mb-4 animate-item" style="animation-delay: 0.4s;">
+                    <label class="form-label text-secondary small-label">ДАТА ТА ЧАС (08:00 - 19:00)</label>
+                    <input type="date" min="@DateTime.Now.ToString("yyyy-MM-dd")" 
+                           @onchange="OnDateChange" class="ios-input mb-2" required />
+                    
+                    <input type="time" min="08:00" max="19:00" 
+                           @onchange="OnTimeChange" class="ios-input" required />
+                    
                     @if (!string.IsNullOrEmpty(errorMessage))
                     {
-                        <div class="alert alert-danger bg-black text-danger py-2 small border-danger">
-                            <i class="bi bi-exclamation-octagon"></i> @errorMessage
-                        </div>
+                        <p class="text-danger small mt-2" style="font-weight: bold;">@errorMessage</p>
                     }
-
-                    <button class="btn btn-gold w-100 mt-2 py-2" @onclick="Save">
-                        ЗАПИСАТИСЯ
-                    </button>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-7">
-            <h4 class="mb-3 gold-text">Журнал Aurum Studio</h4>
-            <div class="table-responsive rounded border-gold">
-                <table class="table table-dark table-hover mb-0 border-0">
-                    <thead>
-                        <tr class="gold-text border-bottom border-secondary">
-                            <th>Майстер</th>
-                            <th>Клієнт</th>
-                            <th>Дата / Час</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Db.Appointments.Any())
-                        {
-                            <tr>
-                                <td colspan="4" class="text-center text-secondary py-4 italic">Наразі записів немає</td>
-                            </tr>
-                        }
-                        @foreach (var appt in Db.Appointments.OrderByDescending(a => a.AppointmentDate).ToList())
-                        {
-                            <tr class="align-middle">
-                                <td><span class="badge border border-gold gold-text bg-transparent">@appt.Doctor?.Name</span></td>
-                                <td class="text-light">@appt.PatientName</td>
-                                <td class="text-light">@appt.AppointmentDate.ToString("dd.MM HH:mm")</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-secondary" @onclick="() => Delete(appt.Id)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                <button type="submit" class="ios-btn-large animate-item" style="animation-delay: 0.5s;" 
+                        disabled="@(!string.IsNullOrEmpty(errorMessage) || newAppointment.DoctorId == 0)">
+                    ПІДТВЕРДИТИ ЗАПИС
+                </button>
+            </EditForm>
+        }
     </div>
 </div>
 
-<style>
-    /* Локальні стилі для сторінки, щоб підтримати графітовий вигляд */
-    .border-gold { border: 1px solid #d4af37 !important; }
-    .bg-black { background-color: #0c0c0c !important; }
-    .gold-text { color: #d4af37 !important; }
-    .btn-gold { background-color: #d4af37 !important; color: #000 !important; font-weight: bold; border: none; }
-    .btn-gold:hover { background-color: #f1c40f !important; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
-    .btn-outline-gold { border: 1px solid #d4af37; color: #d4af37; background: transparent; }
-    .btn-outline-gold:hover { background-color: #d4af37; color: #000; }
-    .italic { font-style: italic; }
+@code {
+    private Appointment newAppointment = new() { DateTime = DateTime.Now };
+    private List<Doctor>? doctors;
+    private string? errorMessage;
     
-    .animated-fade-in {
-        animation: fadeIn 0.5s ease-in;
+    // Змінні для екрану успіху
+    private bool isBooked = false;
+    private string bookedDoctorName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        doctors = await context.Doctors.ToListAsync();
     }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+    private void OnDateChange(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var date))
+        {
+            newAppointment.DateTime = date.Date.Add(newAppointment.DateTime.TimeOfDay);
+            ValidateSelection();
+        }
+    }
+
+    private void OnTimeChange(ChangeEventArgs e)
+    {
+        if (TimeSpan.TryParse(e.Value?.ToString(), out var time))
+        {
+            newAppointment.DateTime = newAppointment.DateTime.Date.Add(time);
+            ValidateSelection();
+        }
+    }
+
+    private void ValidateSelection()
+    {
+        errorMessage = null;
+
+        if (newAppointment.DateTime < DateTime.Now)
+        {
+            errorMessage = "Не можна записатися на минулий час.";
+            return;
+        }
+
+        var hour = newAppointment.DateTime.Hour;
+        if (hour < 8 || hour >= 19)
+        {
+            errorMessage = "Запис можливий тільки з 08:00 до 19:00.";
+        }
+    }
+
+    private async Task HandleBooking()
+    {
+        ValidateSelection();
+        if (!string.IsNullOrEmpty(errorMessage) || newAppointment.DoctorId == 0) return;
+
+        // Перевірка на пустий номер (про всяк випадок)
+        if (string.IsNullOrWhiteSpace(newAppointment.ClientPhone) || newAppointment.ClientPhone.Length < 7)
+        {
+            errorMessage = "Введіть коректний номер телефону.";
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+        context.Appointments.Add(newAppointment);
+        await context.SaveChangesAsync();
+        
+        // Знаходимо ім'я обраного майстра для чеку
+        var doctor = doctors?.FirstOrDefault(d => d.Id == newAppointment.DoctorId);
+        bookedDoctorName = doctor?.Name ?? "Майстер";
+        
+        // Вмикаємо екран успіху замість редіректу
+        isBooked = true; 
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
+
+<style>
+    /* ПРИМУСОВИЙ ЛЕЙАУТ */
+    .booking-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    /* КАРТКА */
+    .booking-card {
+        width: 100%;
+        max-width: 500px;
+        background: rgba(30, 30, 30, 0.8) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 40px;
+        border-radius: 25px;
+        border: 1px solid rgba(212, 175, 55, 0.5) !important;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        position: relative;
+    }
+
+    /* ЛЕЙБЛИ */
+    .small-label {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* ІНПУТИ */
+    .ios-input {
+        display: block !important;
+        width: 100% !important;
+        background: #121212 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 14px 15px !important;
+        color: white !important;
+        outline: none !important;
+        transition: all 0.3s ease;
+    }
+
+    .ios-input:focus {
+        border-color: #d4af37 !important;
+        background: #1a1a1a !important;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+    
+    /* Якщо введено помилкові дані в телефон */
+    .ios-input:invalid:not(:focus):not(:placeholder-shown) {
+        border-color: #ff4d4d !important;
+        box-shadow: 0 0 10px rgba(255, 77, 77, 0.2);
+    }
+
+    /* КНОПКА */
+    .ios-btn-large {
+        display: block;
+        width: 100%;
+        background: #d4af37 !important;
+        color: black !important;
+        border: none !important;
+        padding: 16px !important;
+        border-radius: 15px !important;
+        font-weight: 800 !important;
+        letter-spacing: 1px;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .ios-btn-large:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+    }
+
+    .ios-btn-large:disabled {
+        background: #333 !important;
+        color: #666 !important;
+        border: 1px solid #444 !important;
+        cursor: not-allowed;
+    }
+
+    /* === СТИЛІ ЕКРАНУ УСПІХУ === */
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid #d4af37;
+        color: #d4af37;
+        font-size: 3rem;
+        line-height: 75px;
+        border-radius: 50%;
+        margin: 0 auto;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .receipt-box {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 15px;
+        border-left: 4px solid #d4af37;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* === АНІМАЦІЇ === */
+    .pop-in {
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .animate-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideUpFade 0.5s ease forwards;
+    }
+
+    @@keyframes popIn {
+        0% { transform: scale(0.9); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    @@keyframes slideUpFade {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
     }
 </style>
-
-@code {
-    private int selectedDoctorId;
-    private string patientName = "";
-    private DateTime appointmentTime = DateTime.Now.Date.AddHours(10); 
-    private bool showTicket = false;
-    private string errorMessage = ""; 
-    private Appointment? lastAppointment;
-
-    private void OnTimeChanged(ChangeEventArgs e)
-    {
-        if (DateTime.TryParse(e.Value?.ToString(), out DateTime dt))
-        {
-            // Округлення до кроку в 30 хвилин
-            int minutes = dt.Minute;
-            if (minutes < 15) minutes = 0;
-            else if (minutes < 45) minutes = 30;
-            else { dt = dt.AddHours(1); minutes = 0; }
-            
-            appointmentTime = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, minutes, 0);
-        }
-    }
-
-private void Save()
-{
-    errorMessage = "";
-
-    // Використовуємо наш сервіс для перевірки
-    string result = BookingSvc.ValidateBooking(selectedDoctorId, appointmentTime);
-
-    if (result != "OK")
-    {
-        errorMessage = result;
-        return;
-    }
-
-    // Якщо все пройшло — зберігаємо
-    lastAppointment = new Appointment 
-    { 
-        DoctorId = selectedDoctorId, 
-        AppointmentDate = appointmentTime, 
-        PatientName = patientName 
-    };
-    
-    Db.Appointments.Add(lastAppointment);
-    Db.SaveChanges();
-    
-    showTicket = true;
-    patientName = ""; 
-}
-
-    private void Delete(int id)
-    {
-        var appt = Db.Appointments.Find(id);
-        if (appt != null)
-        {
-            Db.Appointments.Remove(appt);
-            Db.SaveChanges();
-            if (lastAppointment?.Id == id) showTicket = false;
-        }
-    }
-}

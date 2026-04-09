@@ -1,71 +1,73 @@
-﻿<div class="top-row ps-3 navbar navbar-dark bg-black border-bottom border-gold-thin">
-    <div class="container-fluid">
-        <a class="navbar-brand gold-text fw-bold" href="">
-            <i class="bi bi-gem me-2"></i>AURUM STUDIO
+﻿<div class="ios-navbar">
+    <div class="container d-flex justify-content-between align-items-center h-100">
+        <a class="navbar-brand ios-logo" href="">
+            <span class="gold-gradient-text">AURUM</span> <span class="text-white fw-light">STUDIO</span>
         </a>
+        
+        <nav class="d-flex gap-4">
+            <NavLink class="ios-link" href="" Match="NavLinkMatch.All">Головна</NavLink>
+            <NavLink class="ios-link" href="masters">Майстри</NavLink>
+            <NavLink class="ios-link" href="booking">Запис</NavLink>
+        </nav>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').checked = false">
-    <nav class="flex-column mt-2">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link custom-nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill me-2" aria-hidden="true"></span> Головна
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link custom-nav-link" href="masters">
-                <span class="bi bi-people-fill me-2" aria-hidden="true"></span> Наші Майстри
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link custom-nav-link" href="booking">
-                <span class="bi bi-calendar-check-fill me-2" aria-hidden="true"></span> Запис на візит
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
 <style>
-    /* Стилізація NavMenu під Aurum Studio */
-    .border-gold-thin {
-        border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
+    .top-row {
+    display: none !important; /* Повністю видаляємо цю білу смугу */
+}
+
+main {
+    padding-top: 0 !important; /* Прибираємо відступ зверху */
+}
+    .ios-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        z-index: 1000;
+        background: rgba(20, 20, 20, 0.6);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .gold-text {
-        color: #d4af37 !important;
-        letter-spacing: 1.5px;
-        text-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+    .ios-logo {
+        font-family: 'SF Pro Display', -apple-system, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        text-decoration: none;
     }
 
-    .custom-nav-link {
-        color: #e0e0e0 !important;
-        margin: 5px 0;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+    .gold-gradient-text {
+        background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    .custom-nav-link:hover {
-        background-color: rgba(212, 175, 55, 0.1) !important;
-        color: #d4af37 !important;
+    .ios-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
     }
 
-    /* Стиль для активного пункту меню */
-    .custom-nav-link.active {
-        background-color: rgba(212, 175, 55, 0.2) !important;
-        color: #d4af37 !important;
-        border-left: 3px solid #d4af37;
+    .ios-link:hover, .ios-link.active {
+        color: #d4af37;
     }
 
-    .bg-black {
-        background-color: #000000 !important;
-    }
-
-    .navbar-brand {
-        font-size: 1.2rem;
+    .ios-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #d4af37;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
     }
 </style>

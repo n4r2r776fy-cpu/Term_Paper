@@ -19,7 +19,7 @@ public class BookingService
         if (time.Hour < 9 || time.Hour >= 19) return "Робочий час: 09:00 - 19:00.";
         
         // Перевірка на зайнятість
-        bool isBusy = _db.Appointments.Any(a => a.DoctorId == doctorId && a.AppointmentDate == time);
+        bool isBusy = _db.Appointments.Any(a => a.DoctorId == doctorId && a.DateTime == time);
         if (isBusy) return "Цей час уже заброньовано.";
 
         return "OK"; // Все добре

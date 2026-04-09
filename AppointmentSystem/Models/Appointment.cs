@@ -1,14 +1,9 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace AppointmentSystem.Models;
-
 public class Appointment
 {
     public int Id { get; set; }
+    public string ClientName { get; set; } = string.Empty;
+    public string ClientPhone { get; set; } = string.Empty;
     public int DoctorId { get; set; }
-    public string? PatientName { get; set; }
-    public DateTime AppointmentDate { get; set; }
-    
-    [ForeignKey("DoctorId")]
-    public Doctor? Doctor { get; set; }
+    // ПЕРЕВІР ЦЮ НАЗВУ:
+    public DateTime DateTime { get; set; } 
 }
